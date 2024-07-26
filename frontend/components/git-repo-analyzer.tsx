@@ -20,7 +20,6 @@ To read more about using these font, please visit the Next.js documentation:
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   Card,
   CardHeader,
@@ -69,73 +68,55 @@ export function GitRepoAnalyzer() {
     }
   };
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="bg-muted p-4">
-        <nav className="container mx-auto flex items-center justify-between">
-          <Link href="#" className="text-lg font-bold" prefetch={false}>
-            Git Repo Analyzer
-          </Link>
-        </nav>
-      </header>
-      <main className="flex-1 py-12">
-        <Card className="mx-auto max-w-md p-6 bg-background border">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">
-              Git Repo Analyzer
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Enter a repository URL and branch to analyze.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="repo-url">Repository URL</Label>
-                <Input
-                  id="repo-url"
-                  placeholder="https://github.com/user/repo.git"
-                  required
-                  value={repoUrl}
-                  onChange={(e) => setRepoUrl(e.target.value)}
-                />
+    <Card className="mx-auto max-w-md p-6 bg-background border">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Git Repo Analyzer</CardTitle>
+        <CardDescription className="text-muted-foreground">
+          Enter a repository URL and branch to analyze.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <Label htmlFor="repo-url">Repository URL</Label>
+            <Input
+              id="repo-url"
+              placeholder="https://github.com/user/repo.git"
+              required
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="branch-name">Branch Name</Label>
+            <Input
+              id="branch-name"
+              placeholder="main"
+              required
+              value={branchName}
+              onChange={(e) => setBranchName(e.target.value)}
+            />
+          </div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="h-8 w-8 animate-spin" />
+              <div className="text-muted-foreground">Loading...</div>
+              <div className="text-sm text-muted-foreground">
+                This may take a few seconds...
               </div>
-              <div className="space-y-2 mt-4">
-                <Label htmlFor="branch-name">Branch Name</Label>
-                <Input
-                  id="branch-name"
-                  placeholder="main"
-                  required
-                  value={branchName}
-                  onChange={(e) => setBranchName(e.target.value)}
-                />
-              </div>
-              {loading ? (
-                <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                  <div className="h-8 w-8 animate-spin" />
-                  <div className="text-muted-foreground">Loading...</div>
-                  <div className="text-sm text-muted-foreground">
-                    This may take a few seconds...
-                  </div>
-                </div>
-              ) : (
-                <Button type="submit" className="mt-6 w-full">
-                  Analyze Repository
-                </Button>
-              )}
-              {error && (
-                <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
-                  {error}
-                </div>
-              )}
-            </form>
-          </CardContent>
-        </Card>
-      </main>
-      <footer className="bg-muted p-4 text-center text-muted-foreground">
-        <div className="container mx-auto">
-          &copy; 2024 Git Repo Analyzer. All rights reserved.
-        </div>
-      </footer>
-    </div>
+            </div>
+          ) : (
+            <Button type="submit" className="mt-6 w-full">
+              Analyze Repository
+            </Button>
+          )}
+          {error && (
+            <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
+              {error}
+            </div>
+          )}
+        </form>
+      </CardContent>
+    </Card>
   );
 }
