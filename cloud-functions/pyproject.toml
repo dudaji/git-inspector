@@ -9,6 +9,11 @@ readme = "README.md"
 python = "^3.9"
 google-cloud-storage = "^2.18.0"
 functions-framework = "==3.*"
+beautifulsoup4 = "^4.12.3"
+google-auth = "^2.32.0"
+google-auth-oauthlib = "^1.2.1"
+google-auth-httplib2 = "^0.2.0"
+google-api-python-client = "^2.138.0"
 
 
 [build-system]
