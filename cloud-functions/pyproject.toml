@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "cloud-functions"
+version = "0.1.0"
+description = ""
+authors = ["WooSeong Chung <jungyh0528@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+google-cloud-storage = "^2.18.0"
+functions-framework = "==3.*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
