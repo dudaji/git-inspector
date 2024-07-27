@@ -30,12 +30,14 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export function GitRepoAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [branchName, setBranchName] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,25 +45,17 @@ export function GitRepoAnalyzer() {
     setError(null);
 
     try {
-      const response = await fetch("/api/analyze-repo", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ repoUrl, branchName }),
-      });
+      const encodedRepoUrl = encodeURIComponent(repoUrl);
+      const encodedBranchName = encodeURIComponent(branchName);
 
-      if (!response.ok) {
-        throw new Error("Failed to analyze repository");
-      }
-
-      const data = await response.json();
-      console.log(data);
+      router.push(
+        `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}`,
+      );
       setLoading(false);
     } catch (err) {
       setLoading(false);
       if (err instanceof Error) {
-        setError("Error loading repository: " + err.message);
+        setError("Error: " + err.message);
       } else {
         setError("An unknown error occurred");
       }
