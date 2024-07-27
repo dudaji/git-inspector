@@ -22,7 +22,7 @@ export default function AnalysisResults({
     if (repoUrl && branchName) {
       const fetchData = async () => {
         try {
-          const response = await fetch("/api/analyze-repo", {
+          const response = await fetch("http://localhost:8080/api/analyze-repo", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -35,7 +35,7 @@ export default function AnalysisResults({
           }
 
           const data = await response.json();
-          setResult(data.predictions);
+          setResult(data);
           setLoading(false);
         } catch (err) {
           setLoading(false);

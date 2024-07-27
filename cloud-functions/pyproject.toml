@@ -14,6 +14,11 @@ google-auth = "^2.32.0"
 google-auth-oauthlib = "^1.2.1"
 google-auth-httplib2 = "^0.2.0"
 google-api-python-client = "^2.138.0"
+langchain = "^0.2.11"
+langchain-community = "^0.2.10"
+langchain-google-genai = "^1.0.8"
+python-dotenv = "^1.0.1"
+gitpython = "^3.1.43"
 
 
 [build-system]

@@ -25,7 +25,7 @@ poetry install
 1. Run cloud function locally
 
    ```bash
-   functions-framework-python --target <cloud-function-name>
+   functions-framework-python --target analyzer
    ```
 
 2. Go to localhost:8080
