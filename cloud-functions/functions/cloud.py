@@ -1,11 +1,8 @@
+from flask import Request
 import requests
 import json
 from bs4 import BeautifulSoup
-
-
-from clouds.aws import aws
-from functions.clouds.get_azure_price import azure
-from clouds.gcp import gcp
+from functions.analyzer.gemini_analyzer import analyze_repo
 
 
 def get_aws_prices():
@@ -54,5 +51,9 @@ def main():
     print("GCP Prices:", json.dumps(gcp_prices, indent=2))
 
 
-if __name__ == "__main__":
-    main()
+def analyze(request: Request):
+    body = request.get_json(silent=True)
+    print(body)
+    result = analyze_repo(body["repoUrl"], body["branchName"])
+    print(result)
+    return result
