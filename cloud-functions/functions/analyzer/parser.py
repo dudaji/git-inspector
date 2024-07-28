@@ -31,19 +31,13 @@ class Estimate(BaseModel):
     )
 
 
-class DetailResult(BaseModel):
+class Result(BaseModel):
     gcp: Estimate = Field(description="Estimated Result of Google Cloud Platform(GCP)")
     aws: Estimate = Field(description="Estimated Result of Amazon Web Services(AWS)")
     azure: Estimate = Field(description="Estimated Result of Microsoft Azure")
     conclusion: Estimate = Field(
         description="The most appropriate among gcp, aws, and azure"
     )
-
-
-class Result(BaseModel):
-    cost: str = Field(description="Monthly cost of instance")
-    power: str = Field(description="Monthly power consumption of instance")
-    carbon: str = Field(description="Monthly carbon footprint of instsance")
 
 
 output_parser = JsonOutputParser(pydantic_object=Result)
