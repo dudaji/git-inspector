@@ -1,12 +1,16 @@
-export async function fetchAnalysisData(repoUrl?: string, branchName?: string) {
-  if (repoUrl && branchName) {
+export async function fetchAnalysisData(
+  repoUrl?: string,
+  branchName?: string,
+  directory?: string,
+) {
+  if (repoUrl && branchName && directory) {
     try {
       const response = await fetch("https://localhost:8080/api/analyze-repo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ repoUrl, branchName }),
+        body: JSON.stringify({ repoUrl, branchName, directory }),
       });
 
       if (!response.ok) {

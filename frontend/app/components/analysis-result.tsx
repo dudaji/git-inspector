@@ -3,11 +3,13 @@ import { fetchAnalysisData } from "@/app/lib/fetch";
 export default async function AnalysisResults({
   repoUrl,
   branchName,
+  directory,
 }: {
   repoUrl?: string;
   branchName?: string;
+  directory?: string;
 }) {
-  const result = await fetchAnalysisData(repoUrl, branchName);
+  const result = await fetchAnalysisData(repoUrl, branchName, directory);
 
   if (result?.message || result?.message != "") {
     return (

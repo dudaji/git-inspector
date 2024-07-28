@@ -38,6 +38,7 @@ export function GitRepoAnalyzer() {
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
   const [branchName, setBranchName] = useState("");
+  const [directory, setDirectory] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,9 +49,10 @@ export function GitRepoAnalyzer() {
     try {
       const encodedRepoUrl = encodeURIComponent(repoUrl);
       const encodedBranchName = encodeURIComponent(branchName);
+      const encodedDirectory = encodeURIComponent(directory);
 
       router.push(
-        `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}`,
+        `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}&directory=${encodedDirectory}`,
       );
       setLoading(false);
     } catch (err) {
@@ -90,6 +92,16 @@ export function GitRepoAnalyzer() {
               required
               value={branchName}
               onChange={(e) => setBranchName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="directory">Directory</Label>
+            <Input
+              id="directory"
+              placeholder="app/"
+              required
+              value={directory}
+              onChange={(e) => setDirectory(e.target.value)}
             />
           </div>
           {loading ? (

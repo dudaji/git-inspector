@@ -13,6 +13,7 @@ export default function Results({
   searchParams?: {
     repoUrl?: string;
     branchName?: string;
+    directory?: string;
   };
 }) {
   return (
@@ -35,6 +36,7 @@ export default function Results({
           <AnalysisResults
             repoUrl={searchParams?.repoUrl}
             branchName={searchParams?.branchName}
+            directory={searchParams?.directory}
           />
         </Suspense>
       </CardContent>
