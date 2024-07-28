@@ -98,7 +98,7 @@ export function GitRepoAnalyzer() {
             <Label htmlFor="directory">Directory</Label>
             <Input
               id="directory"
-              placeholder="app/"
+              placeholder="/"
               required
               value={directory}
               onChange={(e) => setDirectory(e.target.value)}

@@ -32,6 +32,6 @@ export async function fetchAnalysisData(
     }
   }
   return {
-    message: "An unknown error occurred",
+    message: "Please insert all fields",
   };
 }
