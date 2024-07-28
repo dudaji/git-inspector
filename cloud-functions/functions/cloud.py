@@ -53,7 +53,5 @@ def main():
 
 def analyze(request: Request):
     body = request.get_json(silent=True)
-    print(body)
-    result = analyze_repo(body["repoUrl"], body["branchName"])
-    print(result)
+    result = analyze_repo(body["repoUrl"], body["branchName"], body["directory"])
     return result
