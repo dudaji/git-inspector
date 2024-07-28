@@ -81,6 +81,7 @@ def analyze_repo(clone_url: str, branch: str = "main", folder: str = ""):
     docs = load_repo_code(clone_url, branch, folder)
     chain = get_chain()
     # return chain.invoke({"GITHUB": docs})
+    # return {"cost": "cost", "power": "power", "carbon": "carbon"}
     return {
         "gcp": {
             "instance": {
