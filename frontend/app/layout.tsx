@@ -21,7 +21,7 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <header className="bg-muted p-4">
             <nav className="container mx-auto flex items-center justify-between">
-              <Link href="#" className="text-lg font-bold" prefetch={false}>
+              <Link href="/" className="text-lg font-bold" prefetch={false}>
                 Git Repo Analyzer
               </Link>
             </nav>
