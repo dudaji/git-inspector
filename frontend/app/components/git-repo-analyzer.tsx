@@ -37,7 +37,7 @@ export function GitRepoAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
-  const [branchName, setBranchName] = useState("");
+  const [branchName, setBranchName] = useState("main");
   const [directory, setDirectory] = useState("");
   const router = useRouter();
 
