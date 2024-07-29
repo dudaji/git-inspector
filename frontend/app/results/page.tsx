@@ -17,7 +17,7 @@ export default function Results({
   };
 }) {
   return (
-    <Card className="mx-auto max-w-md p-6 bg-background border">
+    <Card className="mx-auto max-w-5xl p-6 bg-background border">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Analysis Results</CardTitle>
       </CardHeader>
