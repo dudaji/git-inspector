@@ -37,7 +37,7 @@ export function GitRepoAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
-  const [branchName, setBranchName] = useState("");
+  const [branchName, setBranchName] = useState("main");
   const [directory, setDirectory] = useState("");
   const router = useRouter();
 
@@ -50,10 +50,11 @@ export function GitRepoAnalyzer() {
       const encodedRepoUrl = encodeURIComponent(repoUrl);
       const encodedBranchName = encodeURIComponent(branchName);
       const encodedDirectory = encodeURIComponent(directory);
+      const path =
+        `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
+        (directory ? `&directory=${encodedDirectory}` : "");
 
-      router.push(
-        `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}&directory=${encodedDirectory}`,
-      );
+      router.push(path);
       setLoading(false);
     } catch (err) {
       setLoading(false);
@@ -98,8 +99,7 @@ export function GitRepoAnalyzer() {
             <Label htmlFor="directory">Directory</Label>
             <Input
               id="directory"
-              placeholder="/"
-              required
+              placeholder=""
               value={directory}
               onChange={(e) => setDirectory(e.target.value)}
             />
