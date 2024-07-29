@@ -109,7 +109,6 @@ export default async function AnalysisResults({
 
   return (
     <div>
-      <h3 className="text-2xl font-bold mb-4">Cloud Provider Analysis</h3>
       {cloudProviders.map(renderProviderData)}
       <div className="mt-8 p-4 bg-green-100 border-l-4 border-green-500">
         <h4 className="text-lg font-semibold">Conclusion</h4>
