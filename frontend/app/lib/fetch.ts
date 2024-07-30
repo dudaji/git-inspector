@@ -3,10 +3,11 @@ export async function fetchAnalysisData(
   branchName?: string,
   directory?: string,
 ) {
+  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
   if (repoUrl && branchName) {
     try {
       const body = { repoUrl, branchName, ...(directory && { directory }) };
-      const response = await fetch("http://localhost:8080/analyzer", {
+      const response = await fetch(`${analysisEndpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
