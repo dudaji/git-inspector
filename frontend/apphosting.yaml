@@ -9,7 +9,7 @@ runConfig:
 # Environment variables and secrets
 env:
   - variable: ANALYSIS_ENDPOINT
-    secret: projects/975535601453/secrets/ANALYSIS_ENDPOINT
+    secret: ANALYSIS_ENDPOINT
     availability:
       - BUILD
       - RUNTIME
