@@ -8,6 +8,8 @@ First, Setup environment variable in .env.local
 cp ./.env.example ./.env.local
 ```
 
+Copy environment variable values from [Notion](https://www.notion.so/dudaji/2024-07-08-Gemini-API-Developer-competition-b45d57ce7e934f1c8748db9f5450ca58?pvs=4#e7d975f39ba54bf590d159d7501da987)
+
 Second, run the development server:
 
 ```bash
