@@ -1,15 +1,15 @@
 # Settings for Cloud Run
 runConfig:
-  minInstances: 2
+  minInstances: 0
   maxInstances: 100
-  concurrency: 100
-  cpu: 2
-  memoryMiB: 1024
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
 
 # Environment variables and secrets
 env:
   - variable: ANALYSIS_ENDPOINT
-    secret: ANALYSIS_ENDPOINT
+    secret: projects/975535601453/secrets/ANALYSIS_ENDPOINT
     availability:
       - BUILD
       - RUNTIME
