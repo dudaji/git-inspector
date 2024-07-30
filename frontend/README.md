@@ -31,3 +31,31 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 ```bash
 firebase deploy --only hosting:git-inspector
 ```
+
+## Emulate and Deploy cloud function on Firebase
+### Env 설정
+[안내](https://www.notion.so/dudaji/2024-07-08-Gemini-API-Developer-competition-b45d57ce7e934f1c8748db9f5450ca58?pvs=4#3924a8550b9d4e8fbb5e41d91789abdb)에 따라 `.env` 파일을 생성합니다.
+### Emulate
+1. venv 설정
+    ```bash
+    cd functions
+    python -m venv venv
+    ./venv/bin/pip3 install -r requirements.txt
+    ```
+1. Emulator 실행
+
+    ```bash
+    # frontend 폴더로 이동
+    firebase emulators:start --only functions
+    ---
+    # 정상적으로 실행되면 아래와 같은 로그가 나오고, 해당 주소로 요청보낼 수 있음
+    functions[us-central1-analyzer]: http function initialized (http://127.0.0.1:5001/gpu-brokerage/us-central1/analyzer).
+    ```
+1. curl로 테스트
+    ```bash
+    curl -X POST http://127.0.0.1:5001/gpu-brokerage/us-central1/analyzer -d '{"repoUrl": "https://github.com/rjwharry/coin-dashboard.git", "branchName": "main", "directory": ""}' -H "Content-Type: application/json" | jq
+    ```
+### Deploy
+```bash
+firebase deploy --only functions
+```
