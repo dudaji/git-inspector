@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <div className="flex flex-col min-h-screen">
+          <header className="bg-muted p-4">
+            <nav className="container mx-auto flex items-center justify-between">
+              <Link href="/" className="text-lg font-bold" prefetch={false}>
+                Git Repo Analyzer
+              </Link>
+            </nav>
+          </header>
+          <main className="flex-1 py-12">{children}</main>
+          <footer className="bg-muted p-4 text-center text-muted-foreground">
+            <div className="container mx-auto">
+              &copy; 2024 Git Repo Analyzer. All rights reserved.
+            </div>
+          </footer>
+        </div>
+      </body>
     </html>
   );
 }
