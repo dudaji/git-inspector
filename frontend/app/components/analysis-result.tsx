@@ -86,7 +86,6 @@ export default async function AnalysisResults({
             score={score}
           />
         ))}
-
       <ConclusionInstance
         provider={winner}
         instance={result[winner].instance}
