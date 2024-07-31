@@ -2,7 +2,7 @@ import requests
 import json
 import os
 import csv
-from model import CloudCost
+from functions.clouds.cloud_cost import CloudCost
 from typing import List
 
 
