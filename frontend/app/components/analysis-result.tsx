@@ -16,9 +16,11 @@ function ConclusionInstance({
   provider: string;
   instance: CloudInstance;
 }) {
+  const formattedProvider =
+    provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
   return (
     <div key={`${provider}.${instance.name}`} className="mb-8">
-      <h4 className="text-lg font-semibold">{`${provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase()} Instance Info`}</h4>
+      <h4 className="text-lg font-semibold">{`Recommended ${formattedProvider} Instance Setup`}</h4>
       <table className="table-auto w-full mb-4 mt-4">
         <tbody>
           <tr>
@@ -74,14 +76,16 @@ export default async function AnalysisResults({
 
   return (
     <div>
-      {Object.entries(scores).map(([providerName, score]) => (
-        <CloudScoreCard
-          key={providerName}
-          provider={providerName}
-          winner={providerName == winner}
-          score={score}
-        />
-      ))}
+      {Object.entries(scores)
+        .sort((a, b) => b[1].total - a[1].total)
+        .map(([providerName, score]) => (
+          <CloudScoreCard
+            key={providerName}
+            provider={providerName}
+            winner={providerName == winner}
+            score={score}
+          />
+        ))}
 
       <ConclusionInstance
         provider={winner}
