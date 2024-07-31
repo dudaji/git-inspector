@@ -2332,6 +2332,17 @@ files = [
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "pytz"
+version = "2024.1"
+description = "World timezone definitions, modern and historical"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pytz-2024.1-py2.py3-none-any.whl", hash = "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"},
+    {file = "pytz-2024.1.tar.gz", hash = "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -2500,21 +2511,6 @@ tldextract = "*"
 Twisted = ">=18.9.0"
 w3lib = ">=1.17.0"
 "zope.interface" = ">=5.1.0"
-
-[[package]]
-name = "scrapy-selenium"
-version = "0.0.7"
-description = "Scrapy with selenium"
-optional = false
-python-versions = "*"
-files = [
-    {file = "scrapy-selenium-0.0.7.tar.gz", hash = "sha256:51f809802a1f62ed852cfe2d2ed49f6141058cc5254ed4b448d2ffe6f7a1b6e9"},
-    {file = "scrapy_selenium-0.0.7-py3-none-any.whl", hash = "sha256:70766315c7970b12a142e1b7a9f43ffb3ef1260891811062ec9dd46a665d935a"},
-]
-
-[package.dependencies]
-scrapy = ">=1.0.0"
-selenium = ">=3.9.0"
 
 [[package]]
 name = "selenium"
@@ -3233,4 +3229,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "0831f8c226aa54ed322dbb29c2c0420c66291071e7e62ae937d4e9a7a4c35c4e"
+content-hash = "289517156cd31e6b65aa287246d73e093f292a98e2dd382b69444752970ee85e"

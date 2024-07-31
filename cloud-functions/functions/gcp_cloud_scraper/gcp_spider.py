@@ -24,12 +24,32 @@ from datetime import datetime
 # from pydantic import BaseModel, Field
 from typing import List, Optional
 from functions.clouds.cloud_cost import CloudCost
-from functions.clouds._firestore import save_to_firestore
+from functions.clouds._firestore import save_to_firestore_each
 import logging
 
 
 class GCPSpider(scrapy.Spider):
     name = "gcp_spider"
+
+    def set_zoom_level(self, driver, zoom_percent):
+        driver.execute_script(f"document.body.style.zoom='{zoom_percent}%'")
+        time.sleep(2)
+
+    def remove_all_asides(self, driver):
+        driver.execute_script(
+            "const asides = document.querySelectorAll('aside'); asides.forEach(aside => aside.remove());"
+        )
+        time.sleep(1)  # Give time for the script to execute
+
+    def close_popup(self, driver):
+        try:
+            close_button = driver.find_element(
+                By.XPATH,
+                '//span[@class="VfPpkd-kBDsod" and @aria-hidden="true"]/svg/path',
+            )
+            close_button.click()
+        except Exception as e:
+            pass  # Ignore if the element is not found
 
     def start_requests(self):
         region_urls = {
@@ -42,6 +62,7 @@ class GCPSpider(scrapy.Spider):
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-notifications")
 
         for region, url in region_urls.items():
             region_driver = webdriver.Chrome(
@@ -50,6 +71,7 @@ class GCPSpider(scrapy.Spider):
             )
             print(f"start {region} driver")
             region_driver.get(url)
+            # self.set_zoom_level(region_driver, 67)
             WebDriverWait(region_driver, 10).until(
                 EC.presence_of_element_located(
                     (By.XPATH, '//ul[@aria-label="Series"]//li[@role="option"]')
@@ -61,6 +83,8 @@ class GCPSpider(scrapy.Spider):
 
     def parse_machine_type(self, driver, region):
         try:
+            self.close_popup(driver)
+            self.remove_all_asides(driver)
             cookie_consent_button = WebDriverWait(driver, 3).until(
                 EC.element_to_be_clickable((By.XPATH, '//button[text()="나중에"]'))
             )
@@ -69,11 +93,14 @@ class GCPSpider(scrapy.Spider):
             print("쿠키 동의 창을 찾을 수 없습니다:", e)
 
         series_elements = driver.find_elements(
-            By.XPATH, '//ul[@aria-label="Series"]//li[@role="option"]'
+            By.XPATH, '//ul[@aria-label="Series"]/li[@data-value]'
         )
+        print(f"length of sereis element : {len(series_elements)}")
         for series in series_elements:
             series_value = self.get_element_attribute(series, "data-value")
             try:
+                self.close_popup(driver)
+                self.remove_all_asides(driver)
                 series_type_dropdown = (
                     '//div[@aria-controls="i23" and @aria-haspopup="listbox"]'
                 )
@@ -90,22 +117,32 @@ class GCPSpider(scrapy.Spider):
                 time.sleep(1)
                 self.parse_machine_name_spec(driver, region, series_value)
 
+                # Ensure the dropdown area is still accessible and visible
+                self.remove_all_asides(driver)
+                series_type_dropdown_area = driver.find_element(
+                    By.XPATH, series_type_dropdown
+                )
+
                 actions.move_to_element(
                     series_type_dropdown_area
-                ).click.perform()
+                ).click().perform()
+                time.sleep(1)
 
                 WebDriverWait(driver, 3).until(
                     EC.visibility_of_element_located(
                         (By.XPATH, '//ul[@aria-label="Series"]')
                     )
                 )
+
                 time.sleep(1)  # 1초 대기
-            except:
+            except Exception as e:
+                print(f"error occured in series crawling : {e}")
                 continue
 
     # have to click machine type and parse all data (final)
     def parse_machine_name_spec(self, driver, region, series_value):
         try:
+            self.remove_all_asides(driver)
             cookie_consent_button = WebDriverWait(driver, 3).until(
                 EC.element_to_be_clickable((By.XPATH, '//button[text()="나중에"]'))
             )
@@ -126,6 +163,7 @@ class GCPSpider(scrapy.Spider):
         # 드롭다운 버튼을 클릭하기 위해 Actions 사용
         for machine in machine_elements:
             try:
+                self.remove_all_asides(driver)
                 # element = div, spans
                 machine_type_value = self.get_element_attribute(
                     machine, "data-value"
@@ -194,6 +232,8 @@ class GCPSpider(scrapy.Spider):
                     ),
                 )
                 print(cloud_cost)
+                save_to_firestore_each(cloud_cost)
+                self.remove_all_asides(driver)
                 # 드롭다운을 다시 클릭하여 열기
                 actions.move_to_element(
                     machine_type_dropdown_area
@@ -206,6 +246,8 @@ class GCPSpider(scrapy.Spider):
                     )
                 )
                 time.sleep(1)  # 2초 대기
+                self.close_popup(driver)
+                self.remove_all_asides(driver)
             except:
                 continue
 

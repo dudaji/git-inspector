@@ -3,6 +3,7 @@ from functions.clouds.cloud_cost import CloudCost
 from google.cloud import firestore
 import os
 from datetime import datetime
+import pytz
 
 os.environ[
     "GOOGLE_APPLICATION_CREDENTIALS"
@@ -45,7 +46,7 @@ def save_to_firestore(data: List[CloudCost]):
         print(f"Failed to save data to Firestore: {e}")
 
 
-def save_to_firestore_eac(item: CloudCost):
+def save_to_firestore_each(item: CloudCost):
     try:
         db = firestore.Client()
         print("Connected to Firestore.")
@@ -58,9 +59,7 @@ def save_to_firestore_eac(item: CloudCost):
         doc = doc_ref.get()
 
         new_data = item.model_dump()
-        new_data["last_updated"] = datetime.now(datetime.UTC).strftime(
-            "%Y-%m-%d"
-        )
+        new_data["last_updated"] = datetime.now(pytz.UTC).strftime("%Y-%m-%d")
 
         if doc.exists:
             existing_data = doc.to_dict()
