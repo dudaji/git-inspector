@@ -4,7 +4,7 @@ from datetime import datetime
 
 # import csv
 from typing import List
-from model import CloudCost
+from functions.clouds.cloud_cost import CloudCost
 
 # from google.cloud import firestore
 from functions.clouds._firestore import save_to_firestore

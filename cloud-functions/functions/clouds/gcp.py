@@ -1,6 +1,6 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-from model import CloudCost
+from functions.clouds.cloud_cost import CloudCost
 from typing import List
 import os
 import re
