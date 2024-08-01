@@ -6,6 +6,7 @@ import {
 } from "@/app/components/ui/card";
 import AnalysisResults from "@/app/components/analysis-result";
 import { Suspense } from "react";
+import { LanguageDistribution } from "@/app/components/language-distribution";
 
 export default function Results({
   searchParams,
@@ -33,6 +34,15 @@ export default function Results({
             </div>
           }
         >
+          <LanguageDistribution
+            languages={{
+              JavaScript: 1500,
+              TypeScript: 800,
+              HTML: 400,
+              CSS: 200,
+              Python: 100,
+            }}
+          />
           <AnalysisResults
             repoUrl={searchParams?.repoUrl}
             branchName={searchParams?.branchName}
