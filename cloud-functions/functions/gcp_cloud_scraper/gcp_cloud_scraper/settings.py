@@ -96,12 +96,12 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
 
 
-SELENIUM_DRIVER_NAME = 'chrome'
-SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')  # 'which'가 chromedriver의 경로를 반환하는지 확인하십시오.
-SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # 필요한 경우 여기에 다른 인수를 추가할 수 있습니다.
+# SELENIUM_DRIVER_NAME = 'chrome'
+# SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')  # 'which'가 chromedriver의 경로를 반환하는지 확인하십시오.
+# SELENIUM_DRIVER_ARGUMENTS = ['--headless']  # 필요한 경우 여기에 다른 인수를 추가할 수 있습니다.
 
-# 아래 설정을 추가합니다
-SELENIUM_DRIVER_SERVICE_ARGS = [
-    '--verbose',
-    '--log-path=/tmp/chromedriver.log'
-]
+# # 아래 설정을 추가합니다
+# SELENIUM_DRIVER_SERVICE_ARGS = [
+#     '--verbose',
+#     '--log-path=/tmp/chromedriver.log'
+# ]

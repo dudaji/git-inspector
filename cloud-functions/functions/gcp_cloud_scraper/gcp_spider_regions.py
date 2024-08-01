@@ -22,6 +22,7 @@ from selenium.common.exceptions import (
     TimeoutException
 )
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.keys import Keys
 
 # from google.cloud import firestore
 from datetime import datetime
@@ -37,9 +38,14 @@ class GCPSpider(scrapy.Spider):
     name = "gcp_spider"
     data_file = "cloud_costs.csv"
 
+    def press_escape_key(self, driver):
+        actions = ActionChains(driver)
+        actions.send_keys(Keys.ESCAPE).perform()
+        time.sleep(0.5)
+
     def set_zoom_level(self, driver, zoom_percent):
         driver.execute_script(f"document.body.style.zoom='{zoom_percent}%'")
-        time.sleep(2)
+        time.sleep(1)
 
     def remove_all_asides(self, driver):
         driver.execute_script(
@@ -74,7 +80,7 @@ class GCPSpider(scrapy.Spider):
             element
         )
 
-    def scroll_to_element_if_not_visible(self, driver, element, timeout=10):
+    def scroll_to_element_if_not_visible(self, driver, element, timeout=3):
         if not self.is_element_visible(element, driver):
             driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
             try:
@@ -83,19 +89,19 @@ class GCPSpider(scrapy.Spider):
                 )
             except TimeoutException:
                 print("Element is still not visible after scrolling")
+                self.press_escape_key(driver)  # Press ESC key to close any open dropdowns
+                time.sleep(1)
+                driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)  # Retry scrolling
+                try:
+                    WebDriverWait(driver, timeout).until(
+                        lambda d: self.is_element_visible(element, d)
+                    )
+                except TimeoutException:
+                    print("Element is still not visible after second scrolling attempt")
+
 
     def start_requests(self):
-        region_urls = {
-            "asia-northeast3": "https://cloud.google.com/products/calculator?hl=ko&region=asia-northeast3&dl=CiQ1ZGQyZTU1OS1lNzlmLTRkODAtODE3NS04YTBlOTkyMmMyNzAQCBokOEE5NDZFQ0QtMDYzMC00MDUzLThGRDMtOTIyNTY0QTNDNTE2",
-            "us-central1": "https://cloud.google.com/products/calculator?hl=ko&region=us-central1&dl=CiQ1ZGQyZTU1OS1lNzlmLTRkODAtODE3NS04YTBlOTkyMmMyNzAQCBokOEE5NDZFQ0QtMDYzMC00MDUzLThGRDMtOTIyNTY0QTNDNTE2",
-        }
-
-        # chrome_options = Options()
-        # chrome_options.add_argument("--headless")
-        # chrome_options.add_argument("--disable-gpu")
-        # chrome_options.add_argument("--no-sandbox")
-        # chrome_options.add_argument("--disable-dev-shm-usage")
-        # chrome_options.add_argument("--disable-notifications")
+        compute_engine_url = "https://cloud.google.com/products/calculator?hl=ko&region=asia-northeast3&dl=CiQ2MzljY2Q1Mi1hYWNlLTQ1MWQtYjhjMS00MWM4MTgzZWIwZWQQCBokOEE5NDZFQ0QtMDYzMC00MDUzLThGRDMtOTIyNTY0QTNDNTE2"
         firefox_options = Options()
         firefox_options.binary_location = "/Applications/Firefox.app/Contents/MacOS/firefox"
         # firefox_options.add_argument("--headless")  # Enable headless mode
@@ -105,34 +111,76 @@ class GCPSpider(scrapy.Spider):
         firefox_options.add_argument("--disable-notifications")
         geckodriver_path = os.path.join(os.path.dirname(__file__), "geckodriver")
 
-        for region, url in region_urls.items():
-            # region_driver = webdriver.Chrome(
-                # service=Service(ChromeDriverManager().install()),
-                # options=chrome_options,
-            # )
-            
-            region_driver = webdriver.Firefox(
-                    service=Service(geckodriver_path),
-                    options=firefox_options,
-                )
-            print(f"start {region} driver")
-            region_driver.get(url)
-            screen_width = 3840
-            screen_height = 2160
-            # Set the position and size of the window to the left half of the 4K screen
-            region_driver.set_window_position(0, 0)
-            region_driver.set_window_size(screen_width // 2, screen_height)
-            self.set_zoom_level(region_driver, 40)
-            WebDriverWait(region_driver, 10).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, '//ul[@aria-label="Series"]//li[@role="option"]')
-                )
-            )
-            self.parse_machine_type(region_driver, region)
-            print(f"quit {region} driver")
-            region_driver.quit()
+        driver = webdriver.Firefox(service=Service(geckodriver_path), options=firefox_options)
+        driver.get(compute_engine_url)
+        screen_width = 3840
+        screen_height = 2160
+        driver.set_window_position(0, 0)
+        driver.set_window_size(screen_width // 2, screen_height)
+        self.set_zoom_level(driver, 40)
+        self.parse_region(driver)
 
-    def parse_machine_type(self, driver, region):
+    def parse_region(self, driver):
+        try:
+            self.close_popup(driver)
+            # self.remove_all_asides(driver)
+            cookie_consent_button = WebDriverWait(driver, 3).until(
+                EC.element_to_be_clickable((By.XPATH, '//button[text()="나중에"]'))
+            )
+            cookie_consent_button.click()
+        except Exception as e:
+            print("쿠키 동의 창을 찾을 수 없습니다:", e)
+        region_xpath = '//ul[@aria-label="Region"]//li[@data-value]'
+        WebDriverWait(driver, 3).until(
+            EC.presence_of_element_located(
+                (By.XPATH, region_xpath)
+            )
+        )
+        region_elements = driver.find_elements(
+            By.XPATH, '//ul[@aria-label="Region"]/li[@data-value]'
+        )
+        print(f"length of region elements: {len(region_elements)}")
+
+        for index, region in enumerate(region_elements):
+            try: 
+                self.scroll_to_element_if_not_visible(driver, region)
+                region_value = self.get_element_attribute(region, "data-value")
+                print(f"current region_value : {region_value}")
+                region_type_dropdown = (
+                    '//div[@aria-controls="i39" and @aria-haspopup="listbox"]'
+                )
+                region_type_dropdown_area = driver.find_element(
+                    By.XPATH, region_type_dropdown
+                )
+                self.scroll_to_element_if_not_visible(driver, region_type_dropdown_area)
+                region_type_dropdown_area.click()
+
+                time.sleep(1)
+                self.scroll_to_element_if_not_visible(driver, region)
+                actions = ActionChains(driver)
+                actions.move_to_element(region).click().perform()
+                time.sleep(1)
+                # parse machine series
+                self.parse_series(driver, region_value)
+
+                if index < len(region_elements) - 1:
+                    self.scroll_to_element_if_not_visible(driver, region_type_dropdown_area)
+                    actions.move_to_element(
+                        region_type_dropdown_area
+                    ).click().perform()
+                    time.sleep(1)
+                    WebDriverWait(driver, 3).until(
+                        EC.visibility_of_element_located(
+                            (By.XPATH, '//ul[@aria-label="Region"]')
+                        )
+                    )
+                    time.sleep(1)  # 1초 대기
+            except Exception as e:
+                print(f"error occurred in region crawling: {e}, but continue")
+                self.press_escape_key(driver)
+                continue
+
+    def parse_series(self, driver, region):
         try:
             self.close_popup(driver)
             # self.remove_all_asides(driver)
@@ -147,10 +195,13 @@ class GCPSpider(scrapy.Spider):
             By.XPATH, '//ul[@aria-label="Series"]/li[@data-value]'
         )
         print(f"length of sereis element : {len(series_elements)}")
-        for series in series_elements:
+        for index, series in enumerate(series_elements):
             series_value = self.get_element_attribute(series, "data-value")
             if self.is_machine_processed(region, series_value):
                 print(f"Skip already processed machine series: {series_value}")
+                if series_type_dropdown_area.get_attribute("aria-expanded") == "true":
+                    # Find a safe location to click, here we assume the header exists and is clickable
+                    self.press_escape_key(driver)
                 continue
             try:
                 print(
@@ -165,32 +216,34 @@ class GCPSpider(scrapy.Spider):
                 self.scroll_to_element_if_not_visible(driver, series_type_dropdown_area)
                 series_type_dropdown_area.click()
 
-                time.sleep(1)
+                time.sleep(0.5)
 
                 self.scroll_to_element_if_not_visible(driver, series)
                 actions = ActionChains(driver)
                 actions.move_to_element(series).click().perform()
-                time.sleep(1)
-                self.parse_machine_name_spec(driver, region, series_value)
+                time.sleep(0.5)
+                self.parse_machine(driver, region, series_value)
                 
-                self.scroll_to_element_if_not_visible(driver, series_type_dropdown_area)
-                actions.move_to_element(
-                    series_type_dropdown_area
-                ).click().perform()
-                time.sleep(1)
+                # 마지막 요소가 아니라면 dropdown area를 다시 클릭
+                if index < len(series_elements) - 1:
+                    self.scroll_to_element_if_not_visible(driver, series_type_dropdown_area)
+                    actions.move_to_element(
+                        series_type_dropdown_area
+                    ).click().perform()
+                    time.sleep(0.5)
 
-                WebDriverWait(driver, 3).until(
-                    EC.visibility_of_element_located(
-                        (By.XPATH, '//ul[@aria-label="Series"]')
+                    WebDriverWait(driver, 3).until(
+                        EC.visibility_of_element_located(
+                            (By.XPATH, '//ul[@aria-label="Series"]')
+                        )
                     )
-                )
-                time.sleep(1)  # 1초 대기
+                    time.sleep(1)  # 1초 대기
             except Exception as e:
-                print(f"error occured in series crawling : {e}, but continue")
+                print(f"error occurred in series crawling: {e}, but continue")
                 continue
 
     # have to click machine type and parse all data (final)
-    def parse_machine_name_spec(self, driver, region, series_value):
+    def parse_machine(self, driver, region, series_value):
         try:
             # self.remove_all_asides(driver)
             cookie_consent_button = WebDriverWait(driver, 3).until(
@@ -208,12 +261,12 @@ class GCPSpider(scrapy.Spider):
             By.XPATH, machine_type_dropdown
         )
         machine_type_dropdown_area.click()
-        time.sleep(2)  # 2초 대기
+        time.sleep(0.5)  # 2초 대기
         machine_elements = driver.find_elements(
             By.XPATH, '//ul[@aria-label="Machine type"]/li[@data-value]'
         )
         # 드롭다운 버튼을 클릭하기 위해 Actions 사용
-        for machine in machine_elements:
+        for index, machine in enumerate(machine_elements):
             try:
                 # self.remove_all_asides(driver)
                 # element = div, spans
@@ -228,6 +281,8 @@ class GCPSpider(scrapy.Spider):
                 # 이미 처리된 데이터 확인
                 if self.is_machine_processed(region, machine_type_value):
                     print(f"Skip already processed machine type: {machine_type_value}")
+                    if machine_type_dropdown_area.get_attribute("aria-expanded") == "true":
+                        self.press_escape_key(driver)
                     continue
 
                 # 안보이면 스크롤해서 찾기
@@ -271,6 +326,22 @@ class GCPSpider(scrapy.Spider):
                 # 월별 가격 정보 추출
                 # 한국의 경우 가격이 나오는 타입이 별로 없음. region 재설정해서 다시해야할듯.
                 price_text = price_element.text
+                if price_text == "--":
+                    unsupported_type = CloudCost(
+                        vendor="GCP",
+                        name=machine_type_value,
+                        region=region,
+                        cpu=vcpus,
+                        ram=ram,
+                        cost_per_hour="unsupported",
+                        extraction_date=datetime.now().strftime(
+                            "%Y-%m-%d %H:%M:%S"
+                        ),
+                    )
+                    print(f"Unsupported type: {unsupported_type}")
+                    self.save_to_file(unsupported_type)
+                    self.press_escape_key(driver)
+                    continue
                 # 월별 가격을 시간별 가격으로 환산
                 # 쉼표를 제거하고 월별 가격을 시간별 가격으로 환산
                 monthly_price = float(
@@ -294,21 +365,23 @@ class GCPSpider(scrapy.Spider):
                 print(cloud_cost)
                 self.save_to_file(cloud_cost)
                 # 드롭다운 영역으로 다시 스크롤
-                self.scroll_to_element_if_not_visible(driver, machine_type_dropdown_area)
-                actions.move_to_element(
-                    machine_type_dropdown_area
-                ).click().perform()
+                if index < len(machine_elements) - 1:
+                    # 드롭다운 영역으로 다시 스크롤
+                    self.scroll_to_element_if_not_visible(driver, machine_type_dropdown_area)
+                    actions.move_to_element(
+                        machine_type_dropdown_area
+                    ).click().perform()
 
-                # 드롭다운 메뉴 항목 기다리기
-                WebDriverWait(driver, 3).until(
-                    EC.visibility_of_element_located(
-                        (By.XPATH, '//ul[@aria-label="Machine type"]')
+                    # 드롭다운 메뉴 항목 기다리기
+                    WebDriverWait(driver, 3).until(
+                        EC.visibility_of_element_located(
+                            (By.XPATH, '//ul[@aria-label="Machine type"]')
+                        )
                     )
-                )
-                time.sleep(1)  # 2초 대기
+                    time.sleep(1)  # 1초 대기
             except Exception as e:
                 print(f"exception occured : {e}, but continue")
-                time.sleep(10)
+                self.press_escape_key(driver)
                 continue
 
     def get_element_attribute(self, element, attribute):
@@ -334,11 +407,17 @@ class GCPSpider(scrapy.Spider):
         updated_df.to_csv(self.data_file, index=False)
 
 
-    def is_machine_processed(self, region, series_value):
+    def is_machine_processed(self, region, machine_type_value):
         if not os.path.isfile(self.data_file):
             return False
         df = pd.read_csv(self.data_file)
-        return not df[(df['region'] == region) & (df['name'] == series_value) & df['cpu'].notnull() & df['ram'].notnull()].empty
+        processed = df[
+            (df['region'] == region) &
+            (df['name'] == machine_type_value) &
+            df['cpu'].notnull() &
+            df['ram'].notnull()
+        ]
+        return not processed.empty and (processed['cost_per_hour'] != 'unsupported').all()
 
 
 if __name__ == "__main__":
