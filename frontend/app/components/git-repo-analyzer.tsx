@@ -70,7 +70,7 @@ export function GitRepoAnalyzer() {
       <CardHeader>
         <CardTitle className="text-2xl font-bold">Git Repo Analyzer</CardTitle>
         <CardDescription className="text-muted-foreground">
-          Enter a repository URL and branch to analyze.
+          Enter a repository URL, branch name and code directory to analyze.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
