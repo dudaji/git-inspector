@@ -36,11 +36,12 @@ import logging
 
 class GCPSpider(scrapy.Spider):
     name = "gcp_spider"
-    data_file = "cloud_costs.csv"
+    data_file = "gcp_cloud_costs.csv"
 
     def press_escape_key(self, driver):
         actions = ActionChains(driver)
         actions.send_keys(Keys.ESCAPE).perform()
+        print(f"pressed ESC key to close dropdown menu")
         time.sleep(0.5)
 
     def set_zoom_level(self, driver, zoom_percent):
@@ -90,7 +91,6 @@ class GCPSpider(scrapy.Spider):
             except TimeoutException:
                 print("Element is still not visible after scrolling")
                 self.press_escape_key(driver)  # Press ESC key to close any open dropdowns
-                time.sleep(1)
                 driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)  # Retry scrolling
                 try:
                     WebDriverWait(driver, timeout).until(
@@ -98,13 +98,14 @@ class GCPSpider(scrapy.Spider):
                     )
                 except TimeoutException:
                     print("Element is still not visible after second scrolling attempt")
+                    self.press_escape_key(driver)  # Press ESC key to close any open dropdowns
 
 
     def start_requests(self):
         compute_engine_url = "https://cloud.google.com/products/calculator?hl=ko&region=asia-northeast3&dl=CiQ2MzljY2Q1Mi1hYWNlLTQ1MWQtYjhjMS00MWM4MTgzZWIwZWQQCBokOEE5NDZFQ0QtMDYzMC00MDUzLThGRDMtOTIyNTY0QTNDNTE2"
         firefox_options = Options()
         firefox_options.binary_location = "/Applications/Firefox.app/Contents/MacOS/firefox"
-        # firefox_options.add_argument("--headless")  # Enable headless mode
+        firefox_options.add_argument("--headless")  # Enable headless mode
         firefox_options.add_argument("--disable-gpu")
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
