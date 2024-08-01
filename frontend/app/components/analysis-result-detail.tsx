@@ -23,6 +23,7 @@ export default async function AnalysisResultsDetail({
     return <p>No results available.</p>;
   }
 
+  // TODO: Order by Scores.
   const cloudProviders = ["gcp", "aws", "azure"];
   const renderProviderData = (provider: string) => (
     <div key={provider} className="mb-8">
