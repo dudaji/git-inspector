@@ -68,7 +68,7 @@ export function GitRepoAnalyzer() {
   return (
     <Card className="mx-auto max-w-md p-6 bg-background border">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Git Repo Analyzer</CardTitle>
+        <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
         <CardDescription className="text-muted-foreground">
           Enter a repository URL, branch name and code directory to analyze.
         </CardDescription>

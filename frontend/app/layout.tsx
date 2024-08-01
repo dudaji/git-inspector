@@ -6,7 +6,7 @@ import Link from "next/link";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Git Inspector - Optimize Cloud Deployment",
+  title: "Git Watt - Optimize Cloud Deployment",
   description:
     "Analyze your Git repository to determine the most economical and eco-friendly cloud platform for deployment using Google Gemini",
   keywords: [
@@ -16,12 +16,12 @@ export const metadata: Metadata = {
     "Cloud Platform",
     "Eco-friendly",
     "Cost Optimization",
-    "Git Repository Analysis",
+    "Git Watt",
     "Sustainability",
     "Green Computing",
   ],
   openGraph: {
-    title: "Git Inspector - Optimize Cloud Deployment",
+    title: "Git Watt - Optimize Cloud Deployment",
     description:
       "Analyze your Git repository to determine the most economical and eco-friendly cloud platform for deployment using Google Gemini",
     url: "https://git-inspector-nextjs14--gpu-brokerage.us-central1.hosted.app/",
@@ -52,14 +52,14 @@ export default function RootLayout({
           <header className="bg-muted p-4">
             <nav className="container mx-auto flex items-center justify-between">
               <Link href="/" className="text-lg font-bold" prefetch={false}>
-                Git Repo Analyzer
+                Git Watt
               </Link>
             </nav>
           </header>
           <main className="flex-1 py-12">{children}</main>
           <footer className="bg-muted p-4 text-center text-muted-foreground">
             <div className="container mx-auto">
-              &copy; 2024 Git Repo Analyzer. All rights reserved.
+              &copy; 2024 Git Watt. All rights reserved.
             </div>
           </footer>
         </div>
