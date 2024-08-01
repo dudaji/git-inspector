@@ -1,6 +1,6 @@
 import { fetchAnalysisData } from "@/app/lib/fetch";
 
-export default async function AnalysisResults({
+export default async function AnalysisResultsDetail({
   repoUrl,
   branchName,
   directory,
