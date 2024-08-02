@@ -7,6 +7,8 @@ import {
 import AnalysisResults from "@/app/components/analysis-result";
 import { Suspense } from "react";
 import { LanguageDistribution } from "@/app/components/language-distribution";
+import Link from "next/link";
+import { Button } from "@/app/components/ui/button";
 
 export default function Results({
   searchParams,
@@ -17,6 +19,13 @@ export default function Results({
     directory?: string;
   };
 }) {
+  const encodedRepoUrl = encodeURIComponent(searchParams?.repoUrl || "");
+  const encodedBranchName = encodeURIComponent(searchParams?.branchName || "");
+  const encodedDirectory = encodeURIComponent(searchParams?.directory || "");
+  const detailedPagePath =
+    `/results-detail?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
+    (encodedDirectory ? `&directory=${encodedDirectory}` : "");
+
   return (
     <Card className="mx-auto max-w-2xl p-6 bg-background border">
       <CardHeader>
@@ -49,6 +58,9 @@ export default function Results({
             directory={searchParams?.directory}
           />
         </Suspense>
+        <Link href={detailedPagePath}>
+          <Button className="mt-6 w-full">Detailed Analysis</Button>
+        </Link>
       </CardContent>
     </Card>
   );

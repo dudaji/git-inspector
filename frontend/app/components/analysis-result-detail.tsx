@@ -1,6 +1,6 @@
 import { fetchAnalysisData } from "@/app/lib/fetch";
 
-export default async function AnalysisResults({
+export default async function AnalysisResultsDetail({
   repoUrl,
   branchName,
   directory,
@@ -23,6 +23,7 @@ export default async function AnalysisResults({
     return <p>No results available.</p>;
   }
 
+  // TODO: Order by Scores.
   const cloudProviders = ["gcp", "aws", "azure"];
   const renderProviderData = (provider: string) => (
     <div key={provider} className="mb-8">
