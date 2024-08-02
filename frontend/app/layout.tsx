@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { PlasmaEffect } from './components/ui/plasma';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,7 +57,7 @@ export default function RootLayout({
               </Link>
             </nav>
           </header>
-          <main className="flex-1 py-12">{children}</main>
+          <main className="flex-1 py-12 relative"><PlasmaEffect/>{children}</main>
           <footer className="bg-muted p-4 text-center text-muted-foreground">
             <div className="container mx-auto">
               &copy; 2024 Git Watt. All rights reserved.

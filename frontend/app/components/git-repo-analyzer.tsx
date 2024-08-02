@@ -66,64 +66,70 @@ export function GitRepoAnalyzer() {
     }
   };
   return (
-    <Card className="mx-auto max-w-md p-6 bg-background border">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Enter a repository URL, branch name and code directory to analyze.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="repo-url">Repository URL</Label>
-            <Input
-              id="repo-url"
-              placeholder="https://github.com/user/repo.git"
-              required
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="branch-name">Branch Name</Label>
-            <Input
-              id="branch-name"
-              placeholder="main"
-              required
-              value={branchName}
-              onChange={(e) => setBranchName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="directory">Directory</Label>
-            <Input
-              id="directory"
-              placeholder=""
-              value={directory}
-              onChange={(e) => setDirectory(e.target.value)}
-            />
-          </div>
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <div className="h-8 w-8 animate-spin" />
-              <div className="text-muted-foreground">Loading...</div>
-              <div className="text-sm text-muted-foreground">
-                This may take a few seconds...
+    <div className="relative mx-auto max-w-md p-[1.5px] border border-slate-800 rounded-xl overflow-hidden">
+     <div className="animate-rotate absolute inset-0 h-full w-full rounded-full bg-[conic-gradient(#FFFF00_20deg,transparent_120deg)]"></div>
+      <Card className="relative p-6 bg-background border border-slate-800">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Enter a repository URL, branch name and code directory to analyze.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label htmlFor="repo-url">Repository URL</Label>
+              <Input
+                id="repo-url"
+                placeholder="https://github.com/user/repo.git"
+                required
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                />
+            </div>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="branch-name">Branch Name</Label>
+              <Input
+                id="branch-name"
+                placeholder="main"
+                required
+                value={branchName}
+                onChange={(e) => setBranchName(e.target.value)}
+                />
+            </div>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="directory">Directory</Label>
+              <Input
+                id="directory"
+                placeholder=""
+                value={directory}
+                onChange={(e) => setDirectory(e.target.value)}
+                />
+            </div>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <div className="h-8 w-8 animate-spin" />
+                <div className="text-muted-foreground">Loading...</div>
+                <div className="text-sm text-muted-foreground">
+                  This may take a few seconds...
+                </div>
               </div>
-            </div>
-          ) : (
-            <Button type="submit" className="mt-6 w-full">
-              Analyze Repository
-            </Button>
-          )}
-          {error && (
-            <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
-              {error}
-            </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+            ) : (
+              <div className="relative mt-6 w-full animate-pulse-border">
+                <div className="absolute inset-0 animate-pulse-border rounded-lg"></div>
+                <Button type="submit" className="relative w-full">
+                  Analyze Repository
+                </Button>
+              </div>
+            )}
+            {error && (
+              <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
+                {error}
+              </div>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
