@@ -20,8 +20,8 @@ const generateRandomLightning = (count: number) => {
       width: `${width}%`,
       height: `${height}%`,
       path: generateLightningPath(width, height, segments),
-      animationDuration: `${Math.random() * 0.5 + 5}s`, // random animation speed
-      animationDelay: `${Math.random() * 5}s`,
+      animationDuration: `${Math.random() * 10}s`, // 0초에서 10초 사이
+      animationDelay: `${Math.random() * 10}s`, // 0초에서 10초 사이
     };
   });
 };
@@ -58,3 +58,23 @@ export const PlasmaEffect = () => {
     </div>
   );
 };
+
+/* Guide for plasma
+
+width = Math.random() * 50 + 10: 플라즈마의 너비 (10%에서 60% 사이)
+height = Math.random() * 50 + 10: 플라즈마의 높이 (10%에서 60% 사이)
+segments = Math.floor(Math.random() * 5) + 7: 플라즈마 선의 굴곡 수 (7에서 11 사이)
+top: ${Math.random() * 100}%: 플라즈마의 수직 위치 (0%에서 100% 사이)
+left: ${Math.random() * 100}%: 플라즈마의 수평 위치 (0%에서 100% 사이)
+animationDuration: ${Math.random() * 0.5 + 5}s: 애니메이션 속도 (5초에서 5.5초 사이)
+animationDelay: ${Math.random() * 5}s: 애니메이션 시작 지연 시간 (0초에서 5초 사이)
+generateRandomLightning(7): 생성할 플라즈마의 수
+
+이 값들을 조정하여 원하는 효과를 얻을 수 있습니다. 예를 들어:
+
+더 빠른 애니메이션을 원한다면 animationDuration을 줄이세요.
+더 많은 플라즈마를 원한다면 generateRandomLightning()의 인자를 늘리세요.
+더 복잡한 형태의 플라즈마를 원한다면 segments의 범위를 늘리세요.
+더 강한 빛 효과를 원한다면 CSS의 stroke 투명도와 drop-shadow 값을 조정하세요.
+
+*/

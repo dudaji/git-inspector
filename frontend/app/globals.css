@@ -85,14 +85,27 @@
     @apply absolute inset-0 pointer-events-none overflow-hidden;
   }
   .plasma-line {
-    stroke: hsl(var(--plasma) / 0.5);
+    stroke: hsl(var(--primary) / 0.5); 
     stroke-width: 2;
     filter: drop-shadow(0 0 10px hsl(var(--plasma) / 0.5));
-    animation: plasma-flash var(--duration, 1s) infinite var(--delay, 5s);
+    animation: plasma-flash var(--duration, 5s) infinite var(--delay, 5s);
   }
 }
 
 @keyframes plasma-flash {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 0.7; }
+  0%, 100% { opacity: 0; }
+  5%, 10% { opacity: 0.9; }
+  15% { opacity: 0.3; }
+  20%, 25% { opacity: 0.8; }
+  30%, 100% { opacity: 0; }
 }
+
+/*
+
+stroke: hsl(var(--plasma) / 0.5): 플라즈마 선의 색상과 투명도 (0.5는 50% 투명)
+stroke-width: 2: 플라즈마 선의 두께
+filter: drop-shadow(0 0 10px hsl(var(--plasma) / 0.5)): 플라즈마 선의 그림자 효과 (10px는 그림자 크기, 0.5는 그림자 투명도)
+animation: plasma-flash var(--duration, 1s) infinite var(--delay, 5s): 애니메이션 설정 (기본 지속 시간 1초, 기본 지연 시간 5초)
+@keyframes plasma-flash: 애니메이션 중 불투명도 변화 (0.5에서 0.7로)
+
+*/
