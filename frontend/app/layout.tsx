@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     url: "https://git-inspector-nextjs14--gpu-brokerage.us-central1.hosted.app/",
     images: [
       {
-        url: "",
-        width: 1200,
-        height: 630,
-        alt: "",
+        url: "assets/images/512.png",
+        width: 512,
+        height: 512,
+        alt: "Git Watt Icon",
       },
     ],
   },
