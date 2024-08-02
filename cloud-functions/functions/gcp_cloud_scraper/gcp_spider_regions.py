@@ -430,6 +430,5 @@ if __name__ == "__main__":
             "LOG_LEVEL": "ERROR",  # 전체 Scrapy 로그 레벨 설정
         }
     )
-
     process.crawl(GCPSpider)
     process.start()
