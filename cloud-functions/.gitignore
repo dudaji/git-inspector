@@ -3,3 +3,5 @@
 *.csv
 .env
 /repo
+chromedriver
+geckodriver
