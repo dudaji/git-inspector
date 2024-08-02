@@ -4,12 +4,10 @@ import {
   CardTitle,
   CardContent,
 } from "@/app/components/ui/card";
-import AnalysisResults from "@/app/components/analysis-result";
 import { Suspense } from "react";
-import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
+import AnalysisResultsDetail from "../components/analysis-result-detail";
 
-export default function Results({
+export default function ResultsDetail({
   searchParams,
 }: {
   searchParams?: {
@@ -18,17 +16,12 @@ export default function Results({
     directory?: string;
   };
 }) {
-  const encodedRepoUrl = encodeURIComponent(searchParams?.repoUrl || "");
-  const encodedBranchName = encodeURIComponent(searchParams?.branchName || "");
-  const encodedDirectory = encodeURIComponent(searchParams?.directory || "");
-  const detailedPagePath =
-    `/results-detail?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
-    (encodedDirectory ? `&directory=${encodedDirectory}` : "");
-
   return (
     <Card className="mx-auto max-w-2xl p-6 bg-background border">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Analysis Results</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          Detailed Analysis Results
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Suspense
@@ -42,15 +35,12 @@ export default function Results({
             </div>
           }
         >
-          <AnalysisResults
+          <AnalysisResultsDetail
             repoUrl={searchParams?.repoUrl}
             branchName={searchParams?.branchName}
             directory={searchParams?.directory}
           />
         </Suspense>
-        <Link href={detailedPagePath}>
-          <Button className="mt-6 w-full">Detailed Analysis</Button>
-        </Link>
       </CardContent>
     </Card>
   );
