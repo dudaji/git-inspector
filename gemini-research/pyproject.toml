@@ -16,6 +16,11 @@ google-generativeai = "^0.7.2"
 gitpython = "^3.1.43"
 python-dotenv = "^1.0.1"
 langchain-google-genai = "^1.0.7"
+langchain-text-splitters = "^0.2.2"
+lxml = "^5.2.2"
+langchainhub = "^0.1.20"
+ghlinguist = "^1.1.0"
+firebase-admin = "^6.5.0"
 
 
 [build-system]

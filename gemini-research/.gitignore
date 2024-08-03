@@ -175,3 +175,5 @@ pyrightconfig.json
 
 # github repository
 repo/
+
+firebase-svc-account-key.json
