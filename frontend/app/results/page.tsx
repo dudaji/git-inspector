@@ -2,14 +2,13 @@ import {
   Card,
   CardHeader,
   CardTitle,
-  CardContent,
 } from "@/app/components/ui/card";
-import AnalysisResults from "@/app/components/analysis-result";
 import { Suspense } from "react";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import { ResourceRequirements} from "@/app/components/step-2-resource-requirements";
 import { InstanceRecommendations} from "@/app/components/step-3-instance-recommendations";
-import { } from "@/app/components/step-4-cloud-score-costs";
+import CloudCostInstances from "@/app/components/step-4-cloud-cost-winner";
+import { } from "@/app/components/cloud-cost-card";
 import { } from "@/app/components/step-5-anaylsis-details-llm-summary";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
@@ -84,11 +83,12 @@ export default function Results({
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-center"> Instance Recommendations</CardTitle>
               </CardHeader>
-              {/* <InstanceRecommendations
-                repoUrl={searchParams?.repoUrl || ""}
-                branchName={searchParams?.branchName || ""}
-                directory={searchParams?.directory || ""}
-              /> */}
+            {/* Show Summary spec of Instances */} 
+              <CloudCostInstances
+                repoUrl={searchParams?.repoUrl}
+                branchName={searchParams?.branchName}
+                directory={searchParams?.directory}
+              />
             </Card>
           </Suspense>
         </div>
@@ -98,12 +98,13 @@ export default function Results({
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-center"> Cloud Score Costs</CardTitle>
               </CardHeader>
-              {/* <CloudScoreCosts
-                repoUrl={searchParams?.repoUrl || ""}
-                branchName={searchParams?.branchName || ""}
-                directory={searchParams?.directory || ""}
-              /> */}
-            </Card>
+            {/* Show Winner Instance, when Click show all */} 
+              <CloudCostInstances
+                repoUrl={searchParams?.repoUrl}
+                branchName={searchParams?.branchName}
+                directory={searchParams?.directory}
+              />
+              </Card>
           </Suspense>
         </div>
 

@@ -1,6 +1,6 @@
 import { fetchAnalysisData } from "@/app/lib/fetch";
 import { calculateScores } from "@/app/lib/score";
-import CloudScoreCard from "./step-4-cloud-score-costs";
+import CloudScoreCard from "./cloud-cost-card";
 
 interface CloudInstance {
   name: string;
@@ -49,7 +49,7 @@ function ConclusionInstance({
   );
 }
 
-export default async function AnalysisResults({
+export default async function CloudCostInstances({
   repoUrl,
   branchName,
   directory,

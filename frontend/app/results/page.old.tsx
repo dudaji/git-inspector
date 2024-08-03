@@ -4,7 +4,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/app/components/ui/card";
-import AnalysisResults from "@/app/components/analysis-result";
+import CloudCostInstances from "@/app/components/step-4-cloud-cost-winner";
 import { Suspense } from "react";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default function Results({
               Python: 100,
             }}
           />
-          <AnalysisResults
+          <CloudCostInstances
             repoUrl={searchParams?.repoUrl}
             branchName={searchParams?.branchName}
             directory={searchParams?.directory}

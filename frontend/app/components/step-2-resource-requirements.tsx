@@ -15,7 +15,7 @@ export async function ResourceRequirements({ repoUrl }: { repoUrl: string }) {
   return (
     <Card className="flex flex-col bg-secondary-background h-full">
       <CardHeader className="items-center pb-0">
-        <CardTitle>CPU ,Memory</CardTitle>
+        <CardTitle>Minimun Resources to Run</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center h-full">
         <div className="flex items-center space-x-2">
