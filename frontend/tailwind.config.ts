@@ -61,6 +61,9 @@ const config: Config = {
       'plasma-1': 'plasma 2s infinite',
       'plasma-2': 'plasma 2.5s infinite',
       'plasma-3': 'plasma 3s infinite',
+      spin: 'spin 1s ease-in-out infinite',
+      progress: 'progress 3s ease-in-out infinite',
+      blink: 'blink 1s step-end infinite',
     },
     keyframes: {
       rotate: {
@@ -98,6 +101,18 @@ const config: Config = {
         to: {
           height: "0",
         },
+      },
+      spin: {
+        '0%': { transform: 'rotate(0deg)' },
+        '100%': { transform: 'rotate(360deg)' },
+      },
+      progress: {
+        '0%': { width: '0%' },
+        '100%': { width: '100%' },
+      },
+      blink: {
+        '0%, 100%': { opacity: '1' },
+        '50%': { opacity: '0' },
       },
     },
   },
