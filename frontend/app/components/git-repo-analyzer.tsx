@@ -32,9 +32,9 @@ import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
 import { TypingText } from "./ui/typing";
-import Image from 'next/image';
-import Loading from '../../app/assets/images/loading.gif'
-
+// import Image from 'next/image';
+// import Loading from '../../app/assets/images/loading-blue.gif'
+import { LoadingComponent } from "./ui/loading";
 
 export function GitRepoAnalyzer() {
   const [loading, setLoading] = useState(false);
@@ -60,7 +60,7 @@ export function GitRepoAnalyzer() {
       setTimeout(() => {
         router.push(path);
         setLoading(false);
-      }, 1500); // 최소 1.5초 동안 로딩 상태 유지(개발용)
+      }, 5000); // 최소 5초 동안 로딩 상태 유지(개발용)
     } catch (err) {
       setLoading(false);
       if (err instanceof Error) {
@@ -120,15 +120,7 @@ export function GitRepoAnalyzer() {
             </div>
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                <Image
-                  src={Loading}
-                  alt="Loading"
-                  width={180} // Provide width in pixels
-                  height={180} // Provide height in pixels
-                />
-                <div className="text-muted-foreground">
-                  <TypingText text="Analyzing repository with GEMINI API..." />
-                </div>
+                <LoadingComponent/>
               </div>
             ) : (
               <div className="relative mt-6 w-full animate-pulse-border">

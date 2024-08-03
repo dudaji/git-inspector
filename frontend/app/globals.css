@@ -10,14 +10,14 @@
     --card-foreground: 200 100% 90%; /* 밝은 하늘색 카드 글자 */
     --popover: 220 100% 20%; /* 어두운 파란색 팝오버 */
     --popover-foreground: 190 100% 90%; /* 밝은 하늘색 팝오버 글자 */
-    --primary: 190 100% 75%; /* 형광 파란색 */
-    --primary-foreground: 220 100% 10%; /* 어두운 파란색 */
+    --primary: 215 100% 75%; 
+    --primary-foreground: 215 100% 10%; 
     --secondary: 220 100% 20%; /* 어두운 파란색 */
     --secondary-foreground: 190 100% 75%; /* 형광 파란색 */
     --background: 0 0% 10%; /* 어두운 회색 */
     --muted-foreground: 190 100% 75%; /* 형광 파란색 */
-    --accent: 190 100% 75%; /* 형광 파란색 */
-    --accent-foreground: 220 100% 10%; /* 어두운 파란색 */
+    --accent: 180 100% 75%; /* 형광 파란색 */
+    --accent-foreground: 180 100% 10%; /* 어두운 파란색 */
     --destructive: 0 100% 50%; /* 빨간색 */
     --destructive-foreground: 220 100% 10%; /* 어두운 파란색 */
     --border: 190 100% 20%; /* 어두운 파란색 */

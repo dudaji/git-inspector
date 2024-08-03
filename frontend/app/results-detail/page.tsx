@@ -5,7 +5,7 @@ import {
   CardContent,
 } from "@/app/components/ui/card";
 import { Suspense } from "react";
-import AnalysisResultsDetail from "../components/analysis-result-detail";
+import AnalysisResultsDetail from "../components/step-5-anaylsis-details-llm-summary";
 
 export default function ResultsDetail({
   searchParams,

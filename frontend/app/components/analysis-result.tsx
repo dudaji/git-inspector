@@ -1,6 +1,6 @@
 import { fetchAnalysisData } from "@/app/lib/fetch";
 import { calculateScores } from "@/app/lib/score";
-import CloudScoreCard from "./cloud-score-card";
+import CloudScoreCard from "./step-4-cloud-score-costs";
 
 interface CloudInstance {
   name: string;
