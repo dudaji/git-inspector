@@ -6,7 +6,7 @@ import {
 } from "@/app/components/ui/card";
 import AnalysisResults from "@/app/components/analysis-result";
 import { Suspense } from "react";
-import { LanguageDistribution } from "@/app/components/language-distribution";
+import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 

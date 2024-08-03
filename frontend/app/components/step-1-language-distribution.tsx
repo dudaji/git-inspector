@@ -42,7 +42,7 @@ export function LanguageDistribution({
     return chartData.reduce((acc, curr) => acc + curr.bytes, 0);
   }, [chartData]);
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col bg-secondary-background">
       <CardHeader className="items-center pb-0">
         <CardTitle>Programming Languages</CardTitle>
         <CardDescription>Byte Counts</CardDescription>
