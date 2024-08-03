@@ -22,6 +22,13 @@ def calculate_scores(result) -> Scores:
 
 def calculate_languages(result) -> Dict[str, float]:
     return None
+from functions.analyzer.full_analyzer import analyze_full_steps
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+os.environ["LANGCHAIN_PROJECT"] = "Git Analyzer"
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 
 def analyze(request: https_fn.Request):
@@ -43,5 +50,7 @@ def analyze(request: https_fn.Request):
     languages = calculate_languages(result)
     save_to_firestore(
         hash_key, repo_url, branch, directory, result, scores, languages
+    result = analyze_full_steps(
+        body["repoUrl"], body.get("branchName", "main"), body.get("directory", "")
     )
-    return result
+    return result.json()
