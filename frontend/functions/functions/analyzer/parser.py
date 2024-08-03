@@ -32,10 +32,10 @@ class RepoResult(BaseModel):
 
 class Estimate(BaseModel):
     power_consumption: str = Field(
-        description="Estimated hourly power consumption while running an instance of the instance_type(kWh)"
+        description="Estimated hourly power consumption while running an instance of the instance_type(kWh). Example: 0.06 kWh",
     )
     carbon_footprint: str = Field(
-        description="Estimated hourly carbon footprint while running an instance of the instance_type(kg CO2)"
+        description="Estimated hourly carbon footprint while running an instance of the instance_type(kg CO2). Example: 0.025 kg CO2"
     )
     description: str = Field(
         description="Detailed calculation process for estimating power consumption and carbon emissions."

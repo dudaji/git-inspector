@@ -66,7 +66,7 @@ best_instance_prompt = PromptTemplate(
 
 Instructions:
 Analyze the instance specifications and estimation results provided for each cloud provider.
-Compare the hourly cost and carbon footprint of each instance.
+Compare the hourly cost, power consumption, and carbon footprint of each instance.
 Determine which instance offers the best balance of cost efficiency and low environmental impact.
 Clearly explain the reasoning behind your choice, supported by data.
 

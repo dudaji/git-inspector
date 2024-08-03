@@ -1,7 +1,7 @@
 from typing import Dict
 from langchain_core.pydantic_v1 import BaseModel, Field
 from functions.analyzer.calculator import calculate_power_and_carbon
-from functions.analyzer.instance_selector import get_best_instance
+from functions.analyzer.instance_selector import select_best_instance
 from functions.analyzer.parser import InstanceResult
 from functions.analyzer.pricing import get_cheapest_instance
 from functions.analyzer.repo_analyzer import analyze_repo
@@ -32,7 +32,7 @@ def analyze_full_steps(
     gcp = InstanceResult(instance=repo_result.gcp, estimate=calculate_result.gcp)
     azure = InstanceResult(instance=repo_result.azure, estimate=calculate_result.azure)
 
-    best_instance = get_best_instance(aws, gcp, azure)
+    best_instance = select_best_instance([aws, gcp, azure])
 
     return FinalResponse(
         aws=aws,
