@@ -1,7 +1,8 @@
 import hashlib
+from firebase_functions import https_fn
 import os
 import json
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from firebase_functions import https_fn
 from functions.analyzer.full_analyzer import (
     FinalResponse,
@@ -15,6 +16,10 @@ from firebase_functions import https_fn
 from functions.analyzer.model import Scores, DetailedScore
 from functions.firestore import check_cache, save_to_firestore
 from functions.git import get_latest_commit_sha
+
+from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
+
+from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
 
 load_dotenv()
 os.environ["LANGCHAIN_PROJECT"] = "Git Analyzer"
@@ -102,7 +107,19 @@ def calculate_scores(results: FinalResponse) -> Scores:
     )
 
 
-def analyze(request: https_fn.Request) -> dict:
+def get_repo_info(
+    repo_url: str, branch: str = "main", directory: str = ""
+) -> Tuple[str, dict, str]:
+    repo_path, commit_hash = get_latest_commit_sha(repo_url, branch)
+    hash_key = get_gemini_analysis_key(repo_url, branch, directory, commit_hash)
+
+    if cache := check_cache(hash_key):
+        print("Cache hit")
+        return None, cache, hash_key
+    return repo_path, None, hash_key
+
+
+def get_body(request: https_fn.Request) -> Tuple[str, str, str]:
     body = request.get_json(silent=True)
     print(body)
 
@@ -110,19 +127,41 @@ def analyze(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
 
-    repo_path, commit_hash = get_latest_commit_sha(repo_url, branch)
-    hash_key = get_gemini_analysis_key(repo_url, branch, directory, commit_hash)
+    return repo_url, branch, directory
 
-    if cache := check_cache(hash_key):
-        print("Cache hit")
-        return cache
+
+def get_cache(request: https_fn.Request) -> str | None:
+    repo_url, branch, directory = get_body(request)
+    _, cache, _ = get_repo_info(repo_url, branch, directory)
+    if cache:
+        return json.dumps(cache)
+    return None
+
+
+def analyze(request: https_fn.Request) -> str:
+    repo_url, branch, directory = get_body(request)
+
+    repo_path, cache, hash_key = get_repo_info(repo_url, branch, directory)
+    if cache:
+        return json.dumps(cache)
 
     print("Analysis start")
     result = analyze_full_steps(repo_path, directory)
     # result = analyze_with_mock(repo_path, directory)
     scores = calculate_scores(result)
-    result_dict = json.loads(result.json())
-    save_to_firestore(hash_key, repo_url, branch, directory, result_dict, scores)
+    save_to_firestore(
+        hash_key, repo_url, branch, directory, json.loads(result.json()), scores
+    )
 
     print("Analyzed Results", result)
-    return result_dict
+    return result.json()
+
+
+def repo_analyzer(request: https_fn.Request) -> dict:
+    body = request.get_json(silent=True)
+
+    repo_url = body.get("repoUrl")
+    branch = body.get("branchName", "main")
+    directory = body.get("directory", "")
+    repo_path, _ = get_latest_commit_sha(repo_url, branch)
+    return analyze_repo_mock(repo_path, directory).json()
