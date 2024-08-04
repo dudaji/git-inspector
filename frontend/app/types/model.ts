@@ -1,3 +1,6 @@
+export interface GitHub
+
+
 export interface CloudInstance {
   cloudProvider: string;
   name: string;
@@ -68,4 +71,26 @@ export interface GeminiAnalysis {
 export interface CloudProvider {
   instance: CloudInstance;
   estimate: Estimate;
+}
+
+
+// Github Body
+export interface GitBody {
+  repoUrl: string;
+  branchName: string;
+  directory: string;
+}
+
+// Env Body
+export interface EnvBody {
+  aws: CloudInstance;
+  gcp: CloudInstance;
+  azure: CloudInstance;
+}
+
+// Analyze Instance Body
+export interface AnalyzeInstanceBody {
+  aws: InstanceResult;
+  gcp: InstanceResult;
+  azure: InstanceResult;
 }
