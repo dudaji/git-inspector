@@ -188,25 +188,9 @@ def environment_analyzer(request: https_fn.Request) -> dict:
 def get_best_instance(request: https_fn.Request) -> dict:
     body = request.get_json(silent=True)
 
-    repo_url = body.get("repoUrl")
-    branch = body.get("branchName", "main")
-    directory = body.get("directory", "")
     aws_instance = InstanceResult(**body.get("aws"))
     gcp_instance = InstanceResult(**body.get("gcp"))
     azure_instance = InstanceResult(**body.get("azure"))
-    language_ratio = body.get("languageRatio")
     instance_results = [aws_instance, gcp_instance, azure_instance]
     best_instance = select_best_instance(instance_results)
-    result = FinalResponse(
-        aws=aws_instance,
-        gcp=gcp_instance,
-        azure=azure_instance,
-        conclusion=best_instance,
-        language_ratio=language_ratio,
-    )
-    _, _, hash_key = get_repo_info(repo_url, branch, directory)
-    scores = calculate_scores(result)
-    save_to_firestore(
-        hash_key, repo_url, branch, directory, json.loads(result.json()), scores
-    )
     return best_instance.dict(by_alias=True)
