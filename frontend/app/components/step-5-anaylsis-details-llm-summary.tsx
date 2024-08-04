@@ -51,60 +51,42 @@ export default async function AnalysisResultsDetail({
           <tr>
             <td className="border px-4 py-2">Memory</td>
             <td className="border px-4 py-2">
-              {result[provider].instance.memory}
+              {result[provider].instance.ram} GB
             </td>
           </tr>
           <tr>
             <td className="border px-4 py-2">Storage</td>
             <td className="border px-4 py-2">
-              {result[provider].instance.storage}
+              {result[provider].instance.storage} GB
             </td>
           </tr>
           <tr>
             <td className="border px-4 py-2">GPU</td>
             <td className="border px-4 py-2">
-              {result[provider].instance.gpu}
-            </td>
-          </tr>
-          <tr>
-            <td className="border px-4 py-2">Monthly Pricing</td>
-            <td className="border px-4 py-2">
-              {result[provider].pricing.monthly}
+              {result[provider].instance.gpu || "None"}
             </td>
           </tr>
           <tr>
             <td className="border px-4 py-2">Hourly Pricing</td>
             <td className="border px-4 py-2">
-              {result[provider].pricing.hourly}
+              ${result[provider].instance.cost_per_hour.toPrecision(3)}
             </td>
           </tr>
           <tr>
-            <td className="border px-4 py-2">Monthly Power Consumption</td>
+            <td className="border px-4 py-2">Power Consumption (kWh)</td>
             <td className="border px-4 py-2">
-              {result[provider].power_consumption.monthly}
+              {result[provider].estimate.power_consumption}
             </td>
           </tr>
           <tr>
-            <td className="border px-4 py-2">Hourly Power Consumption</td>
+            <td className="border px-4 py-2">Carbon Footprint (kg CO2)</td>
             <td className="border px-4 py-2">
-              {result[provider].power_consumption.hourly}
-            </td>
-          </tr>
-          <tr>
-            <td className="border px-4 py-2">Monthly Carbon Footprint</td>
-            <td className="border px-4 py-2">
-              {result[provider].carbon_footprint.monthly}
-            </td>
-          </tr>
-          <tr>
-            <td className="border px-4 py-2">Hourly Carbon Footprint</td>
-            <td className="border px-4 py-2">
-              {result[provider].carbon_footprint.hourly}
+              {result[provider].estimate.carbon_footprint}
             </td>
           </tr>
         </tbody>
       </table>
-      <p>{result[provider].description}</p>
+      <p>{result[provider].instance.description}</p>
     </div>
   );
 
@@ -113,7 +95,7 @@ export default async function AnalysisResultsDetail({
       {cloudProviders.map(renderProviderData)}
       <div className="mt-8 p-4 bg-green-100 border-l-4 border-green-500">
         <h4 className="text-lg font-semibold">Conclusion</h4>
-        <p>{result.conclusion.description}</p>
+        <p>{result.conclusion.instance.description}</p>
       </div>
     </div>
   );
