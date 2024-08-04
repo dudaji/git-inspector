@@ -31,8 +31,6 @@ def select_best_instance(instances: List[InstanceResult]) -> InstanceResult:
         float(instance.estimate.carbon_footprint.split(" ", 1)[0])
         for instance in instances
     ]
-    print(power_consumptions)
-    print(footprints)
 
     min_cost, max_cost = min(costs), max(costs)
     min_footprint, max_footprint = min(footprints), max(footprints)
