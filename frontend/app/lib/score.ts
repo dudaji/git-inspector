@@ -5,7 +5,8 @@ export interface CloudProvider {
     gpu: string;
   };
   pricing: {
-    monthly: string;
+    // monthly: string;
+    cost_per_hour: string;
   };
   carbon_footprint: {
     monthly: string;
@@ -26,7 +27,8 @@ export function calculateScores(
   const scores: Record<string, Score> = {};
 
   const costs = Object.values(filtered).map((p) =>
-    parseFloat(p.pricing.monthly.replace("$", "")),
+    // parseFloat(p.pricing.monthly.replace("$", "")),
+    parseFloat(p.pricing.cost_per_hour.replace("$", "")),
   );
   const cpus = Object.values(filtered).map((p) =>
     parseInt(p.instance.cpu.split(" ")[0]),
@@ -46,7 +48,7 @@ export function calculateScores(
   const maxCarbon = Math.max(...carbonFootprints);
 
   for (const [name, provider] of Object.entries(filtered)) {
-    const cost = parseFloat(provider.pricing.monthly.replace("$", ""));
+    const cost = parseFloat(provider.pricing.cost_per_hour.replace("$", ""));
     const cpu = parseInt(provider.instance.cpu.split(" ")[0]);
     const memory = parseFloat(provider.instance.memory.split(" ")[0]);
     const carbonFootprint = parseFloat(
