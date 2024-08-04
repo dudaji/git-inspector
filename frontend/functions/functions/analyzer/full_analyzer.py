@@ -41,3 +41,92 @@ def analyze_full_steps(
         conclusion=best_instance,
         language_ratio=repo_result.language_ratio,
     )
+
+
+def analyze_with_mock(
+    clone_url: str, branch: str = "main", folder: str = ""
+) -> FinalResponse:
+    return FinalResponse(
+        **{
+            "aws": {
+                "instance": {
+                    "cloud_provider": "AWS",
+                    "name": "t3.medium",
+                    "cpu": 2,
+                    "ram": 4.0,
+                    "storage": 10,
+                    "gpu": None,
+                    "region": "us-east-1",
+                    "cost_per_hour": 0.0441,
+                    "description": "This application requires a minimum of 2 vCPUs and 2GB of RAM to run. A simple Java application with Spring Boot and MySQL usually doesn't demand high CPU or memory resources. Therefore, a t3.medium instance, which provides a balance of performance and cost, is chosen. 10GB of storage is sufficient for this application and its data. The application does not require a GPU. The us-east-1 region offers a good balance of cost and latency for many users.",
+                },
+                "estimate": {
+                    "power_consumption": "0.06 kWh",
+                    "carbon_footprint": "0.025 kg CO2",
+                    "description": "Based on the AWS power consumption data for t3.medium instance and considering a sustained CPU utilization of 40%, the estimated hourly power consumption is 0.06 kWh. This calculation considers the PUE of AWS data centers. The carbon footprint is estimated to be 0.025 kg CO2 per hour, based on the region's grid carbon intensity and AWS's sustainability initiatives.",
+                },
+            },
+            "gcp": {
+                "instance": {
+                    "cloud_provider": "GCP",
+                    "name": "e2-medium",
+                    "cpu": 1,
+                    "ram": 4.0,
+                    "storage": 10,
+                    "gpu": None,
+                    "region": "us-central1",
+                    "cost_per_hour": 0.0169861111111111,
+                    "description": "This application requires a minimum of 2 vCPUs and 2GB of RAM to run. A simple Java application with Spring Boot and MySQL usually doesn't demand high CPU or memory resources. Therefore, an e2-medium instance, which provides a balance of performance and cost, is chosen. 10GB of storage is sufficient for this application and its data. The application does not require a GPU. The us-central1 region offers a good balance of cost and latency for many users.",
+                },
+                "estimate": {
+                    "power_consumption": "0.05 kWh",
+                    "carbon_footprint": "0.01 kg CO2",
+                    "description": "Based on the GCP Carbon Footprint calculator and considering the e2-medium instance located in us-central1 region has a sustained CPU utilization of 40%, the estimated hourly power consumption is 0.05 kWh. This calculation considers the PUE of Google Cloud's data centers. The carbon footprint is estimated to be 0.01 kg CO2 per hour, based on the region's grid carbon intensity and Google's commitment to renewable energy.",
+                },
+            },
+            "azure": {
+                "instance": {
+                    "cloud_provider": "Azure",
+                    "name": "Standard_B2s",
+                    "cpu": 2,
+                    "ram": 4.0,
+                    "storage": 10,
+                    "gpu": "None",
+                    "region": "eastus",
+                    "cost_per_hour": 0.0456,
+                    "description": "This application requires a minimum of 2 vCPUs and 2GB of RAM to run. A simple Java application with Spring Boot and MySQL usually doesn't demand high CPU or memory resources. Therefore, a Standard_B2s instance, which provides a balance of performance and cost, is chosen. 10GB of storage is sufficient for this application and its data. The application does not require a GPU. The eastus region offers a good balance of cost and latency for many users.",
+                },
+                "estimate": {
+                    "power_consumption": "0.07 kWh",
+                    "carbon_footprint": "0.03 kg CO2",
+                    "description": "Based on the Azure Sustainability Calculator and considering the Standard_B2s instance located in the eastus region has a sustained CPU utilization of 40%, the estimated hourly power consumption is 0.07 kWh. This calculation considers the PUE of Azure's data centers. The carbon footprint is estimated to be 0.03 kg CO2 per hour, based on the region's grid carbon intensity and Microsoft's commitment to renewable energy.",
+                },
+            },
+            "conclusion": {
+                "instance": {
+                    "cloud_provider": "GCP",
+                    "name": "e2-medium",
+                    "cpu": 1,
+                    "ram": 4.0,
+                    "storage": 10,
+                    "gpu": "None",
+                    "region": "us-central1",
+                    "cost_per_hour": 0.0169861111111111,
+                    "description": "This application requires a minimum of 2 vCPUs and 2GB of RAM to run. A simple Java application with Spring Boot and MySQL usually doesn't demand high CPU or memory resources. Therefore, an e2-medium instance, which provides a balance of performance and cost, is chosen. 10GB of storage is sufficient for this application and its data. The application does not require a GPU. The us-central1 region offers a good balance of cost and latency for many users.",
+                },
+                "estimate": {
+                    "power_consumption": "0.05 kWh",
+                    "carbon_footprint": "0.01 kg CO2",
+                    "description": "Based on the GCP Carbon Footprint calculator and considering the e2-medium instance located in us-central1 region has a sustained CPU utilization of 40%, the estimated hourly power consumption is 0.05 kWh. This calculation considers the PUE of Google Cloud's data centers. The carbon footprint is estimated to be 0.01 kg CO2 per hour, based on the region's grid carbon intensity and Google's commitment to renewable energy.",
+                },
+            },
+            "language_ratio": {
+                "Kotlin": 1754,
+                "Properties": 1056,
+                "YAML": 810,
+                "Shell": 3607,
+                "Batch": 2830,
+                "JSON": 2742,
+            },
+        }
+    )

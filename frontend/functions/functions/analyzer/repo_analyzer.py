@@ -11,11 +11,7 @@ from functions.analyzer.prompt import repo_analyze_prompt
 load_dotenv()
 repo_dir = "repo"
 
-filter_doc_name = [
-    "package-lock.json",
-    "node-modules",
-    "poetry.lock",
-]
+filter_doc_name = ["package-lock.json", "node-modules", "poetry.lock", ".DS_Store"]
 
 
 def load_repo_code(
