@@ -9,7 +9,7 @@ export async function fetchAnalysisData(
   if (repoUrl && branchName) {
     try {
       const body = { repoUrl, branchName, ...(directory && { directory }) };
-      const response = await fetch(`${analysisEndpoint}`, {
+      const response = await fetch(`${analysisEndpoint}/cache`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +102,11 @@ export async function fetchResourceRequirements(repoUrl: string) {
 }
 
 // Step-3 Fetch - get costs
-export async function fetchRecommendations(repoUrl: string, cpu: number, memory: number) {
+export async function fetchRecommendations(
+  repoUrl: string,
+  cpu: number,
+  memory: number,
+) {
   const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
   try {
     const response = await fetch(`${analysisEndpoint}/recommendations`, {
