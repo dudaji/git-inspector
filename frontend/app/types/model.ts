@@ -1,6 +1,3 @@
-export interface GitHub
-
-
 export interface CloudInstance {
   cloudProvider: string;
   name: string;
