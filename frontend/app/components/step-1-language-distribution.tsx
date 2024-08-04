@@ -5,7 +5,7 @@
  */
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -20,12 +20,29 @@ import {
 } from "@/app/components/ui/chart";
 import { Label, PieChart, Pie } from "recharts";
 import { Colors, getHexColour } from "github-linguist-colours";
+import { fetchAnalysisData } from "@/app/lib/fetch";
 
 export function LanguageDistribution({
-  languages,
+  repoUrl,
+  branchName,
+  directory,
 }: {
-  languages: Record<string, number>;
+  repoUrl?: string;
+  branchName?: string;
+  directory?: string;
 }) {
+  const [languages, setLanguages] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const fetch = async () => {
+      const data = await fetchAnalysisData(repoUrl, branchName, directory);
+      const languages = data?.language_ratio;
+
+      setLanguages(languages);
+    };
+
+    fetch();
+  }, [repoUrl, branchName, directory]);
+
   const chartData = Object.entries(languages).map(
     ([language, bytes]: [language: string, bytes: number]) => ({
       language,
@@ -33,14 +50,17 @@ export function LanguageDistribution({
       fill: getHexColour(language as Colors),
     }),
   );
+
   const chartConfig = {
     languages: {
       label: "Bytes",
     },
   };
+
   const totalLanguageBytes = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.bytes, 0);
   }, [chartData]);
+
   return (
     <Card className="flex flex-col bg-secondary-background">
       <CardHeader className="items-center pb-0">
