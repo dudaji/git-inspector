@@ -1,9 +1,13 @@
 import hashlib
+import os
 import json
 from typing import Optional, Dict
 from firebase_functions import https_fn
-from functions.analyzer.full_analyzer import analyze_full_steps, analyze_with_mock
-import os
+from functions.analyzer.full_analyzer import (
+    FinalResponse,
+    analyze_full_steps,
+    analyze_with_mock,
+)
 
 from dotenv import load_dotenv
 from firebase_functions import https_fn
@@ -11,7 +15,6 @@ from firebase_functions import https_fn
 from functions.analyzer.model import Scores, DetailedScore
 from functions.firestore import check_cache, save_to_firestore
 from functions.git import get_latest_commit_sha
-from functions.analyzer.full_analyzer import FinalResponse, analyze_full_steps
 
 load_dotenv()
 os.environ["LANGCHAIN_PROJECT"] = "Git Analyzer"
