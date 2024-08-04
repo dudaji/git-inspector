@@ -4,15 +4,11 @@
 
 import json
 from firebase_functions import https_fn
-from firebase_admin import initialize_app
 
 from functions.cloud import analyze
 
 
-initialize_app()
-
-
-@https_fn.on_request()
+@https_fn.on_request(timeout_sec=300)
 def analyzer(req: https_fn.Request) -> https_fn.Response:
     if req.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type

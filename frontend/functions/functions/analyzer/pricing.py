@@ -1,4 +1,5 @@
 from math import inf
+from pathlib import Path
 from google.cloud.firestore_v1.base_query import FieldFilter, Or, And
 import firebase_admin
 from firebase_admin import credentials
@@ -27,7 +28,7 @@ def correct_instance_price(instance: Instance) -> Instance:
             cloud_provider=instance.cloud_provider,
             storage=instance.storage,
             description=instance.description,
-            **docs[0].to_dict()
+            **docs[0].to_dict(),
         )
     return instance
 
@@ -41,8 +42,10 @@ def get_cheapest_instance(instance: Instance) -> Instance:
         Instance: The cheapest instance
     """
     if not firebase_admin._apps:
-        cred = credentials.Certificate("firebase-svc-account-key.json")
-        firebase_admin.initialize_app(cred)
+        cred = credentials.Certificate(
+            f"{Path(__file__).resolve().parent}/../../../firebase-svc-account-key.json"
+        )
+        app = firebase_admin.initialize_app(cred)
     db = firestore.client()
     ref = db.collection("cloud_cost")
     vendor_filter = FieldFilter("vendor", "==", instance.cloud_provider)
