@@ -21,6 +21,7 @@ import {
 import { Label, PieChart, Pie } from "recharts";
 import { Colors, getHexColour } from "github-linguist-colours";
 import { fetchAnalysisData } from "@/app/lib/fetch";
+import { LoadingComponent } from "./ui/loading";
 
 export function LanguageDistribution({
   repoUrl,
@@ -32,23 +33,32 @@ export function LanguageDistribution({
   directory?: string;
 }) {
   const [languages, setLanguages] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const fetch = async () => {
-      const data = await fetchAnalysisData(repoUrl, branchName, directory);
-      const languages = data?.language_ratio;
-
-      setLanguages(languages);
+      setLoading(true);
+      try {
+        const data = await fetchAnalysisData(repoUrl, branchName, directory);
+        const languages = data?.language_ratio || {};
+        setLanguages(languages);
+      } catch (error) {
+        console.error("Error fetching analysis data:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetch();
   }, [repoUrl, branchName, directory]);
 
-  const chartData = Object.entries(languages).map(
-    ([language, bytes]: [language: string, bytes: number]) => ({
-      language,
-      bytes,
-      fill: getHexColour(language as Colors),
-    }),
+  const chartData = React.useMemo(
+    () =>
+      Object.entries(languages).map(([language, bytes]) => ({
+        language,
+        bytes,
+        fill: getHexColour(language as Colors),
+      })),
+    [languages],
   );
 
   const chartConfig = {
@@ -63,60 +73,64 @@ export function LanguageDistribution({
 
   return (
     <Card className="flex flex-col bg-secondary-background">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Programming Languages</CardTitle>
-        <CardDescription>Byte Counts</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={chartData}
-              dataKey="bytes"
-              nameKey="language"
-              innerRadius={60}
-              strokeWidth={5}
+      {(loading && <LoadingComponent />) || (
+        <>
+          <CardHeader className="items-center pb-0">
+            <CardTitle>Programming Languages</CardTitle>
+            <CardDescription>Byte Counts</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 pb-0">
+            <ChartContainer
+              config={chartConfig}
+              className="mx-auto aspect-square max-h-[250px]"
             >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-2xl font-bold"
-                        >
-                          {totalLanguageBytes.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Total Bytes
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
+              <PieChart>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Pie
+                  data={chartData}
+                  dataKey="bytes"
+                  nameKey="language"
+                  innerRadius={60}
+                  strokeWidth={5}
+                >
+                  <Label
+                    content={({ viewBox }) => {
+                      if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                        return (
+                          <text
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                          >
+                            <tspan
+                              x={viewBox.cx}
+                              y={viewBox.cy}
+                              className="fill-foreground text-2xl font-bold"
+                            >
+                              {totalLanguageBytes.toLocaleString()}
+                            </tspan>
+                            <tspan
+                              x={viewBox.cx}
+                              y={(viewBox.cy || 0) + 24}
+                              className="fill-muted-foreground"
+                            >
+                              Total Bytes
+                            </tspan>
+                          </text>
+                        );
+                      }
+                    }}
+                  />
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </>
+      )}
     </Card>
   );
 }
