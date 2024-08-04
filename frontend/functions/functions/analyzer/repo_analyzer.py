@@ -5,6 +5,7 @@ from langchain_core.documents import Document
 
 from functions.analyzer.llm import get_llm
 from functions.analyzer.parser import RepoResult, repo_result_parser
+from functions.analyzer.pricing import correct_instance_price
 from functions.analyzer.prompt import repo_analyze_prompt
 
 
@@ -62,4 +63,8 @@ def analyze_repo(clone_url: str, branch: str = "main", folder: str = "") -> Repo
     """
     docs = load_repo_code(clone_url, branch, folder)
     chain = repo_analyze_prompt | get_llm(temperature=0.5) | repo_result_parser
-    return chain.invoke({"GITHUB": docs})
+    repo_result = chain.invoke({"GITHUB": docs})
+    repo_result: RepoResult = chain.invoke({"GITHUB": docs})
+    repo_result.aws = correct_instance_price(repo_result.aws)
+    repo_result.gcp = correct_instance_price(repo_result.gcp)
+    return repo_result
