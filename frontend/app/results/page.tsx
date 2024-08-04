@@ -1,15 +1,11 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-} from "@/app/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Suspense } from "react";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
-import { ResourceRequirements} from "@/app/components/step-2-resource-requirements";
-import { InstanceRecommendations} from "@/app/components/step-3-instance-recommendations";
+import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
+import { InstanceRecommendations } from "@/app/components/step-3-instance-recommendations";
 import CloudCostInstances from "@/app/components/step-4-cloud-cost-winner";
-import { } from "@/app/components/cloud-cost-card";
-import { } from "@/app/components/step-5-anaylsis-details-llm-summary";
+import {} from "@/app/components/cloud-cost-card";
+import {} from "@/app/components/step-5-anaylsis-details-llm-summary";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { LoadingComponent } from "../components/ui/loading";
@@ -30,17 +26,17 @@ export default function Results({
     `/results-detail?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
     (encodedDirectory ? `&directory=${encodedDirectory}` : "");
 
-  const repoUrl = searchParams?.repoUrl || "N/A";  // Default to "N/A" if undefined
-  const branchName = searchParams?.branchName || "N/A";  // Default to "N/A" if undefined
+  const repoUrl = searchParams?.repoUrl || "N/A"; // Default to "N/A" if undefined
+  const branchName = searchParams?.branchName || "N/A"; // Default to "N/A" if undefined
 
-    return (
-      <div className="mx-auto max-w-7xl p-6 bg-background border">
+  return (
+    <div className="mx-auto max-w-7xl p-6 bg-background border">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           Analysis Results of branch
-          <span style={{ color: 'hsl(var(--accent))' }}> {branchName} </span>
+          <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
           in
-          <span style={{ color: 'hsl(var(--accent))' }}> {repoUrl}</span>
+          <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
         </CardTitle>
       </CardHeader>
       <div className="flex flex-wrap -mx-2">
@@ -48,16 +44,14 @@ export default function Results({
           <Suspense fallback={<LoadingComponent />}>
             <Card className="h-full">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">Language Distribution</CardTitle>
+                <CardTitle className="text-xl font-bold text-center">
+                  Language Distribution
+                </CardTitle>
               </CardHeader>
               <LanguageDistribution
-                languages={{
-                  JavaScript: 1500,
-                  TypeScript: 800,
-                  HTML: 400,
-                  CSS: 200,
-                  Python: 100,
-                }}
+                repoUrl={searchParams?.repoUrl || ""}
+                branchName={searchParams?.branchName || ""}
+                directory={searchParams?.directory || ""}
               />
             </Card>
           </Suspense>
@@ -66,7 +60,9 @@ export default function Results({
           <Suspense fallback={<LoadingComponent />}>
             <Card className="h-full">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">Resource Requirements</CardTitle>
+                <CardTitle className="text-xl font-bold text-center">
+                  Resource Requirements
+                </CardTitle>
               </CardHeader>
               <ResourceRequirements
                 repoUrl={searchParams?.repoUrl || ""}
@@ -81,9 +77,12 @@ export default function Results({
           <Suspense fallback={<LoadingComponent />}>
             <Card className="mb-4">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-center"> Instance Recommendations</CardTitle>
+                <CardTitle className="text-xl font-bold text-center">
+                  {" "}
+                  Instance Recommendations
+                </CardTitle>
               </CardHeader>
-            {/* Show Summary spec of Instances */} 
+              {/* Show Summary spec of Instances */}
               <CloudCostInstances
                 repoUrl={searchParams?.repoUrl}
                 branchName={searchParams?.branchName}
@@ -96,22 +95,25 @@ export default function Results({
           <Suspense fallback={<LoadingComponent />}>
             <Card className="mb-4">
               <CardHeader>
-                <CardTitle className="text-xl font-bold text-center"> Cloud Score Costs</CardTitle>
+                <CardTitle className="text-xl font-bold text-center">
+                  {" "}
+                  Cloud Score Costs
+                </CardTitle>
               </CardHeader>
-            {/* Show Winner Instance, when Click show all */} 
+              {/* Show Winner Instance, when Click show all */}
               <CloudCostInstances
                 repoUrl={searchParams?.repoUrl}
                 branchName={searchParams?.branchName}
                 directory={searchParams?.directory}
               />
-              </Card>
+            </Card>
           </Suspense>
         </div>
-
       </div>
       <Link href={detailedPagePath}>
         <Button className="mt-6 w-full">Get All LLM Analysis</Button>
       </Link>
     </div>
-    );
-  }
+  );
+}
+

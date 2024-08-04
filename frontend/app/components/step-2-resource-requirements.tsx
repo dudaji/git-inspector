@@ -1,11 +1,8 @@
-"use client";
-
 import React from "react";
 import {
   Card,
   CardHeader,
   CardTitle,
-  CardDescription,
   CardContent,
 } from "@/app/components/ui/card";
 import { fetchResourceRequirements } from "@/app/lib/fetch";
@@ -20,8 +17,7 @@ export async function ResourceRequirements({ repoUrl }: { repoUrl: string }) {
       <CardContent className="flex flex-col items-center justify-center h-full">
         <div className="flex items-center space-x-2">
           <div className="text-4xl font-bold text-primary">
-            {/* {requirements.cpu} */}
-            2
+            {/* {requirements.cpu} */}2
           </div>
           <div className="text-4xl font-medium text-muted-foreground">CPU</div>
         </div>
@@ -29,9 +25,11 @@ export async function ResourceRequirements({ repoUrl }: { repoUrl: string }) {
           <div className="text-4xl font-bold text-primary">
             {/* {requirements.memory}
              */}
-             4
+            4
           </div>
-          <div className="text-4xl font-medium text-muted-foreground">Gi Memory</div>
+          <div className="text-4xl font-medium text-muted-foreground">
+            Gi Memory
+          </div>
         </div>
       </CardContent>
     </Card>

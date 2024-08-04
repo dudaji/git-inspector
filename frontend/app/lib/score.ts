@@ -1,15 +1,19 @@
 export interface CloudProvider {
   instance: {
-    cpu: string;
-    memory: string;
-    gpu: string;
+    cpu: number;
+    description: string;
+    cloud_provider: string;
+    ram: number;
+    cost_per_hour: number;
+    storage: number;
+    gpu: string | null;
+    region: string;
+    name: string;
   };
-  pricing: {
-    // monthly: string;
-    cost_per_hour: string;
-  };
-  carbon_footprint: {
-    monthly: string;
+  estimate: {
+    carbon_footprint: string;
+    description: string;
+    power_consumption: string;
   };
 }
 
@@ -23,21 +27,14 @@ export interface Score {
 export function calculateScores(
   results: Record<string, CloudProvider>,
 ): [string, Record<string, Score>] {
-  const { conclusion, ...filtered } = results;
+  const { conclusion, language_ratio, ...filtered } = results;
   const scores: Record<string, Score> = {};
 
-  const costs = Object.values(filtered).map((p) =>
-    // parseFloat(p.pricing.monthly.replace("$", "")),
-    parseFloat(p.pricing.cost_per_hour.replace("$", "")),
-  );
-  const cpus = Object.values(filtered).map((p) =>
-    parseInt(p.instance.cpu.split(" ")[0]),
-  );
-  const memories = Object.values(filtered).map((p) =>
-    parseFloat(p.instance.memory.split(" ")[0]),
-  );
+  const costs = Object.values(filtered).map((p) => p.instance.cost_per_hour);
+  const cpus = Object.values(filtered).map((p) => p.instance.cpu);
+  const memories = Object.values(filtered).map((p) => p.instance.ram);
   const carbonFootprints = Object.values(filtered).map((p) =>
-    parseFloat(p.carbon_footprint.monthly.split(" ")[0]),
+    parseFloat(p.estimate.carbon_footprint.split(" ")[0]),
   );
 
   const minCost = Math.min(...costs);
@@ -48,13 +45,14 @@ export function calculateScores(
   const maxCarbon = Math.max(...carbonFootprints);
 
   for (const [name, provider] of Object.entries(filtered)) {
-    const cost = parseFloat(provider.pricing.cost_per_hour.replace("$", ""));
-    const cpu = parseInt(provider.instance.cpu.split(" ")[0]);
-    const memory = parseFloat(provider.instance.memory.split(" ")[0]);
+    const cost = provider.instance.cost_per_hour;
+    const cpu = provider.instance.cpu;
+    const memory = provider.instance.ram;
     const carbonFootprint = parseFloat(
-      provider.carbon_footprint.monthly.split(" ")[0],
+      provider.estimate.carbon_footprint.split(" ")[0],
     );
-    const hasGPU = provider.instance.gpu != "None";
+    const hasGPU =
+      provider.instance.gpu != null && provider.instance.gpu !== "None";
 
     const costScore = 40 - ((cost - minCost) / (maxCost - minCost)) * 30;
 

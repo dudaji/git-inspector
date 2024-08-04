@@ -21,6 +21,7 @@ lxml = "^5.2.2"
 langchainhub = "^0.1.20"
 ghlinguist = "^1.1.0"
 firebase-admin = "^6.5.0"
+python-polyglot = "^4.2.9"
 
 
 [build-system]
