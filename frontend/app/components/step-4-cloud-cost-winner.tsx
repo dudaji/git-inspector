@@ -59,7 +59,6 @@ export default async function CloudCostInstances({
   directory?: string;
 }) {
   const result = await fetchAnalysisData(repoUrl, branchName, directory);
-  console.log("data result : ", result)
 
   if (result?.message) {
     return (
