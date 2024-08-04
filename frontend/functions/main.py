@@ -8,7 +8,7 @@ from firebase_functions import https_fn
 from functions.cloud import analyze
 
 
-@https_fn.on_request()
+@https_fn.on_request(timeout_sec=60)
 def analyzer(req: https_fn.Request) -> https_fn.Response:
     if req.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
@@ -25,5 +25,5 @@ def analyzer(req: https_fn.Request) -> https_fn.Response:
     # Set CORS headers for the main request
     headers = {"Access-Control-Allow-Origin": "*"}
     result = analyze(req)
-    return https_fn.Response(json.dumps(result), headers=headers, status=200)
+    return https_fn.Response(result, headers=headers, status=200)
     # return https_fn.Response("Hello world!")

@@ -1,10 +1,10 @@
 import os
-from git import Repo
+from git import Repo, Tuple
 
 REPO_DIR = "repo"
 
 
-def get_latest_commit_sha(repo_url: str, branch: str) -> str:
+def get_latest_commit_sha(repo_url: str, branch: str) -> Tuple[str, str]:
     project_name = repo_url.split("/")[-1].split(".")[0]
     repo_path = f"{REPO_DIR}/{project_name}"
     if not os.path.exists(repo_path):
@@ -21,4 +21,4 @@ def get_latest_commit_sha(repo_url: str, branch: str) -> str:
     remote.pull()
     sha = repo.head.object.hexsha
 
-    return sha
+    return repo_path, sha

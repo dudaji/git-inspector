@@ -15,29 +15,23 @@ repo_dir = "repo"
 filter_doc_name = ["package-lock.json", "node-modules", "poetry.lock", ".DS_Store"]
 
 
-def load_repo_code(
-    clone_url: str, branch: str = "main", folder: str = ""
-) -> List[Document]:
+def load_repo_code(repo_path: str, directory: str = "") -> List[Document]:
     """
     Get all codes from given github repository
     Arguments:
         clone_url (str): Github repository clone url
         branch (str, optional): Branch of github repository to analyze. Default: main
-        folder (Str, optional): Specify folder to analyze
+        directory (Str, optional): Specify directory to analyze
     Returns:
         List of langchain Document. One Document corresponds to one file
     """
-    project_name = clone_url.split("/")[-1].split(".")[0]
-    repo_path = f"{repo_dir}/{project_name}"
     loader = GitLoader(
-        clone_url=clone_url,
         repo_path=repo_path,
-        branch=branch,
     )
     docs = loader.load()
-    if folder != "":
+    if directory != "":
         docs = list(
-            filter(lambda d: d.metadata["source"].startswith(f"{folder}/"), docs)
+            filter(lambda d: d.metadata["source"].startswith(f"{directory}/"), docs)
         )
     docs = list(
         filter(
@@ -48,7 +42,7 @@ def load_repo_code(
     return docs
 
 
-def analyze_repo(clone_url: str, branch: str = "main", folder: str = "") -> RepoResult:
+def analyze_repo(repo_path: str, directory: str = "") -> RepoResult:
     """
     Analyze given github repository and estimate maintenance price, power consumption, and
     carbon footprint
@@ -56,12 +50,12 @@ def analyze_repo(clone_url: str, branch: str = "main", folder: str = "") -> Repo
     Arguments:
         clone_url (str): Github repository clone url
         branch (str, optional): Branch of github repository to analyze. Default: main
-        folder (Str, optional): Specify folder to analyze
+        directory (Str, optional): Specify directory to analyze
 
     Returns:
         RepoResult: Analysis results for a given repository
     """
-    docs = load_repo_code(clone_url, branch, folder)
+    docs = load_repo_code(repo_path, directory)
     chain = repo_analyze_prompt | get_llm(temperature=0.5) | repo_result_parser
     repo_result = chain.invoke({"GITHUB": docs})
     repo_result: RepoResult = chain.invoke({"GITHUB": docs})

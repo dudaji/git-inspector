@@ -28,7 +28,7 @@ def correct_instance_price(instance: Instance) -> Instance:
             cloud_provider=instance.cloud_provider,
             storage=instance.storage,
             description=instance.description,
-            **docs[0].to_dict()
+            **docs[0].to_dict(),
         )
     return instance
 

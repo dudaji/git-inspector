@@ -110,7 +110,7 @@ def analyze(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
 
-    commit_hash = get_latest_commit_sha(repo_url, branch)
+    repo_path, commit_hash = get_latest_commit_sha(repo_url, branch)
     hash_key = get_gemini_analysis_key(repo_url, branch, directory, commit_hash)
 
     if cache := check_cache(hash_key):
@@ -118,7 +118,8 @@ def analyze(request: https_fn.Request) -> dict:
         return cache
 
     print("Analysis start")
-    result = analyze_full_steps(repo_url, branch, directory)
+    result = analyze_full_steps(repo_path, directory)
+    # result = analyze_with_mock(repo_path, directory)
     scores = calculate_scores(result)
     result_dict = json.loads(result.json())
     save_to_firestore(hash_key, repo_url, branch, directory, result_dict, scores)
