@@ -1,24 +1,12 @@
 import { fileURLToPath } from "url";
+import { CloudInstance, Estimate, Scores, DetailedScore } from "@/app/types/model";
 
 export interface CloudProvider {
-  instance: {
-    cpu: number;
-    description: string;
-    cloudProvider: string;
-    ram: number;
-    costPerHour: number;
-    storage: number;
-    gpu: string | null;
-    region: string;
-    name: string;
-  };
-  estimate: {
-    carbonFootprint: string;
-    description: string;
-    powerConsumption: string;
-  };
+  instance: CloudInstance;
+  estimate: Estimate;
 }
 
+// TODO??
 export interface Score {
   cost: number;
   performance: number;
@@ -83,4 +71,24 @@ export function calculateScores(
   }, Object.keys(scores)[0]);
 
   return [winner, scores];
+}
+
+
+
+// 새로 추가된 최소 비용 인스턴스 반환 함수
+export function getMinInstanceCost(
+  results: Record<string, CloudProvider>,
+): [string, CloudInstance] {
+  const { conclusion, languageRatio, ...filtered } = results;
+  const costs = Object.values(filtered).map((p) => p.instance.costPerHour);
+
+  const minCost = Math.min(...costs);
+
+  for (const [name, provider] of Object.entries(filtered)) {
+    if (provider.instance.costPerHour === minCost) {
+      return [name, provider.instance];
+    }
+  }
+
+  throw new Error("No minimum cost instance found");
 }

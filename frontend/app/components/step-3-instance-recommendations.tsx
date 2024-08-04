@@ -1,25 +1,20 @@
-import { fetchAnalysisData } from '@/app/lib/fetch';
-import { calculateScores } from "@/app/lib/score";
+import { getMinInstanceCost } from "@/app/lib/score";
 import CloudScoreCard from "./cloud-cost-card";
 import React, { useState } from "react";
+import { Modal } from "@/app/components/ui/modal";
+import { CloudInstance } from "@/app/types/model";
 
-interface CloudInstance {
-  name: string;
-  cpu: string;
-  memory: string;
-  gpu: string;
-  storage: string;
+interface CloudInstanceProps {
+  provider: string;
+  instance: CloudInstance;
+  onClick: () => void;
 }
 
 function ConclusionInstance({
   provider,
   instance,
   onClick,
-}: {
-  provider: string;
-  instance: CloudInstance;
-  onClick: () => void;
-}) {
+}: CloudInstanceProps) {
   const formattedProvider =
     provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
   return (
@@ -37,7 +32,7 @@ function ConclusionInstance({
           </tr>
           <tr>
             <td className="border px-4 py-2">Memory</td>
-            <td className="border px-4 py-2">{instance.memory}</td>
+            <td className="border px-4 py-2">{instance.ram}</td>
           </tr>
           <tr>
             <td className="border px-4 py-2">Storage</td>
@@ -56,34 +51,39 @@ function ConclusionInstance({
   );
 }
 
-export default async function InstanceRecommendations({
-  repoUrl,
-  branchName,
-  directory,
+const InstanceRecommendations = ({
+  recommendationData,
 }: {
-  repoUrl?: string;
-  branchName?: string;
-  directory?: string;
-}) {
-  const result = await fetchAnalysisData(repoUrl, branchName, directory);
+  recommendationData: any;
+}) => {
   const [showDetails, setShowDetails] = useState(false);
 
-  if (result?.message) {
+  if (recommendationData?.message) {
     return (
       <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
-        {`ERROR: ${result.message}`}
+        {`ERROR: ${recommendationData.message}`}
       </div>
     );
   }
 
-  if (Object.keys(result).length == 0) {
+  if (!recommendationData || Object.keys(recommendationData).length === 0) {
     return <p>No results available.</p>;
   }
 
-  const [winner, scores] = calculateScores(result);
-
-  const conclusionProvider = winner; // or fetch from result.conclusion.provider
-  const conclusionInstance = result.conclusion.instance;
+  console.log("How recommendation looks?", recommendationData)
+  const [winner, instance] = getMinInstanceCost(recommendationData);
+  const conclusionProvider = winner;
+  const conclusionInstance: CloudInstance = {
+    cloudProvider: conclusionProvider,
+    name: instance.name,
+    cpu: instance.cpu,
+    ram: instance.ram,
+    storage: instance.storage,
+    gpu: instance.gpu,
+    region: instance.region,
+    costPerHour: instance.costPerHour,
+    description: instance.description
+  };
 
   return (
     <div>
@@ -92,19 +92,19 @@ export default async function InstanceRecommendations({
         instance={conclusionInstance}
         onClick={() => setShowDetails(true)}
       />
-      <p>{result.conclusion.description}</p>
-      {showDetails && (
-        <div>
-          {Object.keys(result).map(provider => (
-            <CloudScoreCard
-              key={provider}
-              provider={provider}
-              score={result[provider].score}
-              winner={provider === conclusionProvider}
-            />
-          ))}
-        </div>
-      )}
+      <p>{recommendationData.conclusion.description}</p>
+      <Modal isVisible={showDetails} onClose={() => setShowDetails(false)}>
+        {Object.keys(recommendationData).map(provider => (
+          <CloudScoreCard
+            key={provider}
+            provider={provider}
+            score={recommendationData[provider].score}
+            winner={provider === conclusionProvider}
+          />
+        ))}
+      </Modal>
     </div>
   );
-}
+};
+
+export default InstanceRecommendations;

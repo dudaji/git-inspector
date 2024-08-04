@@ -6,7 +6,7 @@ import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Suspense } from "react";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
-import { InstanceRecommendations } from "@/app/components/step-3-instance-recommendations";
+import InstanceRecommendations  from "@/app/components/step-3-instance-recommendations";
 import CloudCostInstances from "@/app/components/step-4-cloud-cost-winner";
 import {} from "@/app/components/cloud-cost-card";
 import {} from "@/app/components/step-5-anaylsis-details-llm-summary";
@@ -135,12 +135,9 @@ export default function Results({
                   Instance Recommendations
                 </CardTitle>
               </CardHeader>
-              {/* Show Summary spec of Instances */}
-              {/* <CloudCostInstances
-                repoUrl={searchParams?.repoUrl}
-                branchName={searchParams?.branchName}
-                directory={searchParams?.directory}
-              /> */}
+              <InstanceRecommendations
+                recommendationData={recommendationData} // Pass the fetched data
+              />
             </Card>
           </Suspense>
         </div>
