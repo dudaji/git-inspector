@@ -160,7 +160,7 @@ def analyze(request: https_fn.Request) -> dict:
     )
 
     print("Analyzed Results", result)
-    return result.dict()
+    return result.dict(by_alias=True)
 
 
 def repo_analyzer(request: https_fn.Request) -> dict:
@@ -170,7 +170,7 @@ def repo_analyzer(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
     repo_path, _ = get_latest_commit_sha(repo_url, branch)
-    return analyze_repo_mock(repo_path, directory).dict()
+    return analyze_repo_mock(repo_path, directory).dict(by_alias=True)
 
 
 def environment_analyzer(request: https_fn.Request) -> dict:
@@ -180,7 +180,9 @@ def environment_analyzer(request: https_fn.Request) -> dict:
     gcp_instance = Instance(**body.get("gcp"))
     azure_instance = Instance(**body.get("azure"))
 
-    return estimate_environment_mock(aws_instance, gcp_instance, azure_instance).dict()
+    return estimate_environment_mock(aws_instance, gcp_instance, azure_instance).dict(
+        by_alias=True
+    )
 
 
 def get_best_instance(request: https_fn.Request) -> dict:
@@ -207,4 +209,4 @@ def get_best_instance(request: https_fn.Request) -> dict:
     save_to_firestore(
         hash_key, repo_url, branch, directory, json.loads(result.json()), scores
     )
-    return best_instance.dict()
+    return best_instance.dict(by_alias=True)

@@ -1,4 +1,3 @@
-from typing import List
 from functions.analyzer.llm import get_llm
 from functions.analyzer.parser import (
     Estimate,
