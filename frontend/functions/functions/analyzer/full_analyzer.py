@@ -19,10 +19,8 @@ class FinalResponse(BaseModel):
     )
 
 
-def analyze_full_steps(
-    clone_url: str, branch: str = "main", folder: str = ""
-) -> FinalResponse:
-    repo_result = analyze_repo(clone_url, branch, folder)
+def analyze_full_steps(repo_path: str, directory: str = "") -> FinalResponse:
+    repo_result = analyze_repo(repo_path, directory)
     repo_result.aws = get_cheapest_instance(repo_result.aws)
     repo_result.gcp = get_cheapest_instance(repo_result.gcp)
 
@@ -43,9 +41,7 @@ def analyze_full_steps(
     )
 
 
-def analyze_with_mock(
-    clone_url: str, branch: str = "main", folder: str = ""
-) -> FinalResponse:
+def analyze_with_mock(repo_path: str, directory: str = "") -> FinalResponse:
     return FinalResponse(
         **{
             "aws": {
