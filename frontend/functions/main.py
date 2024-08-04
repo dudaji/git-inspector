@@ -5,7 +5,13 @@
 import json
 from firebase_functions import https_fn
 
-from functions.cloud import get_cache, repo_analyzer, analyze
+from functions.cloud import (
+    environment_analyzer,
+    get_best_instance,
+    get_cache,
+    repo_analyzer,
+    analyze,
+)
 
 
 @https_fn.on_request(timeout_sec=300)
@@ -56,8 +62,23 @@ def analyze_step_by_step(req: https_fn.Request) -> https_fn.Response:
             if cache is not None:
                 ret = cache
                 status = 200
-        if uri_path == "/analyze-repo":  # step 1
+            else:
+                ret = {"error": "No cache is found"}
+                status = 404
+        if (
+            uri_path == "/analyze-repo"
+        ):  # step 1: Get minimum instance spec per cloud provider
             ret = repo_analyzer(req)
             status = 200
+        elif (
+            uri_path == "/analyze-env"
+        ):  # step 2: Calculate power consumption and carbon footprint
+            ret = environment_analyzer(req)
+            status = 200
+        elif (
+            uri_path == "/analyze-instance"
+        ):  # step 3: Select the most eco friendly instance
+            ret = get_best_instance(req)
+            status = 200
 
-    return https_fn.Response(ret, headers=headers, status=status)
+    return https_fn.Response(json.dumps(ret), headers=headers, status=status)
