@@ -1,19 +1,30 @@
-from typing import Optional, Dict
-from firebase_admin import initialize_app, firestore
-from functions.analyzer.model import GeminiAnalysis, Scores
-from functions.analyzer.parser import Result
+import json
+from typing import Optional, Union
+from pathlib import Path
 
-initialize_app()
+import firebase_admin
+from firebase_admin import initialize_app, firestore, credentials
+
+from functions.analyzer.model import GeminiAnalysis, Scores
+from functions.analyzer.full_analyzer import FinalResponse
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(
+        f"{Path(__file__).resolve().parent}/../../firebase-svc-account-key.json"
+    )
+    app = initialize_app(cred)
+
 db = firestore.client()
 
 
 def check_cache(gemini_analysis_key: str) -> Optional[dict]:
-    analysis_ref = db.collection("gemini_analysis").document(
-        gemini_analysis_key
-    )
+    analysis_ref = db.collection("gemini_analysis").document(gemini_analysis_key)
     doc = analysis_ref.get()
 
-    return doc.to_dict() if doc.exists else None
+    if doc.exists:
+        return doc.to_dict().get("result")
+
+    return None
 
 
 def save_to_firestore(
@@ -21,20 +32,23 @@ def save_to_firestore(
     repo_url: str,
     branch: str,
     directory: Optional[str],
-    result: Result,
+    result: Union[dict, FinalResponse],
     scores: Scores,
-    languages: Dict[str, float],
 ) -> None:
+    result_dict = result
     if not result:
         raise SystemError("Gemini cannot generate result")
+
+    if isinstance(result_dict, FinalResponse):
+        result_dict = json.loads(result_dict.json())
 
     doc_ref = db.collection("gemini_analysis").document(key)
     analysis = GeminiAnalysis(
         repo_url=repo_url,
         branch=branch,
-        directory=directory,
-        result=result,
+        directory=directory or "",
+        result=result_dict,
         scores=scores,
-        languages=languages,
     )
-    doc_ref.set(analysis.to_dict())
+    print("Save Analysis")
+    doc_ref.set(json.loads(analysis.model_dump_json()))

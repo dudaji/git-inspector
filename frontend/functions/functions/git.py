@@ -14,7 +14,7 @@ def get_latest_commit_sha(repo_url: str, branch: str) -> str:
             branch=branch,
         )
     else:
-        repo = Repo(repo_url)
+        repo = Repo(repo_path)
 
     remote = repo.remotes.origin
     remote.pull()

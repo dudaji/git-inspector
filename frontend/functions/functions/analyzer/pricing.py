@@ -1,4 +1,5 @@
 from math import inf
+from pathlib import Path
 from google.cloud.firestore_v1.base_query import FieldFilter, Or, And
 import firebase_admin
 from firebase_admin import credentials
@@ -16,7 +17,9 @@ def get_cheapest_instance(instance: Instance) -> Instance:
         Instance: The cheapest instance
     """
     if not firebase_admin._apps:
-        cred = credentials.Certificate("firebase-svc-account-key.json")
+        cred = credentials.Certificate(
+            f"{Path(__file__).resolve().parent}/../../../firebase-svc-account-key.json"
+        )
         app = firebase_admin.initialize_app(cred)
     db = firestore.client()
     ref = db.collection("cloud_cost")
