@@ -18,6 +18,7 @@ type SearchParams = {
 };
 
 async function LatestResults({ analysisData }: { analysisData: any }) {
+  console.log("Fetched analysis data for LatestResults:", analysisData);
   const resourceRequirements = await fetchResourceRequirements({
     aws: analysisData.aws as CloudInstance,
     gcp: analysisData.gcp as CloudInstance,
@@ -38,6 +39,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
       estimate: resourceRequirements.azure as InstanceResult["estimate"],
     },
   });
+  console.log("Fetched instance recommendations:", instanceRecommendation);
 
   return (
     <>
@@ -77,8 +79,13 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
   const branchName = searchParams?.branchName || "N/A";
   const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
 
+  console.log("Fetching cache data for:", gitBody);
   const cacheData = await fetchCache(gitBody);
+  console.log("Fetched cache data:", cacheData);
+
+  console.log("Fetching analysis data for:", gitBody);
   const analysisData = await fetchAnalysisData(gitBody);
+  console.log("Fetched analysis data:", analysisData);
 
   return (
     <div className="mx-auto max-w-7xl p-6 bg-background border">
