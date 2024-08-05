@@ -1,42 +1,71 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-
+import React, { Suspense } from 'react';
 import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
-import { Suspense } from "react";
+// import LanguageDistribution from "@/app/components/step-1-language-distribution";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
-import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
-import InstanceRecommendations  from "@/app/components/step-3-instance-recommendations";
-import CloudCostInstances from "@/app/components/step-4-cloud-cost-winner";
-import {} from "@/app/components/cloud-cost-card";
-import {} from "@/app/components/step-5-anaylsis-details-llm-summary";
+// import ResourceRequirements from "@/app/components/step-2-resource-requirements";
+// import InstanceRecommendationsWithData from "@/app/components/step-3-instance-recommendations";
+// import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winner";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
-import { LoadingComponent } from "../components/ui/loading";
-import {
-  fetchAnalysisData,
-  fetchResourceRequirements,
-  fetchRecommendations,
-  fetchCache,
-} from "@/app/lib/fetch_steps"; // Ensure you have these exports in your API file
+import { LoadingComponent } from "@/app/components/ui/loading";
+import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch_steps";
+import { GitBody, EnvBody, AnalyzeInstanceBody, InstanceResult, CloudInstance } from "@/app/types/model";
 
-export default function Results({
-  searchParams,
-}: {
-  searchParams?: {
-    repoUrl?: string;
-    branchName?: string;
-    directory?: string;
-  };
-}) {
-  const [languageData, setLanguageData] = useState(null);
-  const [resourceData, setResourceData] = useState(null);
-  const [recommendationData, setRecommendationData] = useState(null);
-  const [costData, setCostData] = useState(null);
-  const [summaryData, setSummaryData] = useState(null);
-  const [cacheData, setCacheData] = useState(null);
-  const [loading, setLoading] = useState(true);
+type SearchParams = {
+  repoUrl?: string;
+  branchName?: string;
+  directory?: string;
+};
 
+async function LatestResults({ analysisData }: { analysisData: any }) {
+  const resourceRequirements = await fetchResourceRequirements({
+    aws: analysisData.aws as CloudInstance,
+    gcp: analysisData.gcp as CloudInstance,
+    azure: analysisData.azure as CloudInstance,
+  });
+
+  const instanceRecommendation = await fetchRecommendations({
+    aws: {
+      instance: analysisData.aws as CloudInstance,
+      estimate: resourceRequirements.aws as InstanceResult["estimate"],
+    },
+    gcp: {
+      instance: analysisData.gcp as CloudInstance,
+      estimate: resourceRequirements.gcp as InstanceResult["estimate"],
+    },
+    azure: {
+      instance: analysisData.azure as CloudInstance,
+      estimate: resourceRequirements.azure as InstanceResult["estimate"],
+    },
+  });
+
+  return (
+    <>
+      <div className="w-full md:w-1/2 px-2 mt-5">
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-center">
+              Instance Recommendations
+            </CardTitle>
+          </CardHeader>
+          {/* <InstanceRecommendationsWithData recommendationData={instanceRecommendation} /> */}
+        </Card>
+      </div>
+      <div className="w-full md:w-1/2 px-2 mt-5">
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-center">
+              Cloud Score Costs
+            </CardTitle>
+          </CardHeader>
+          {/* <CloudCostInstancesWithData data={instanceRecommendation} /> */}
+        </Card>
+      </div>
+    </>
+  );
+}
+
+export default async function ResultsPage({ searchParams }: { searchParams: SearchParams }) {
   const encodedRepoUrl = encodeURIComponent(searchParams?.repoUrl || "");
   const encodedBranchName = encodeURIComponent(searchParams?.branchName || "");
   const encodedDirectory = encodeURIComponent(searchParams?.directory || "");
@@ -44,31 +73,12 @@ export default function Results({
     `/results-detail?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
     (encodedDirectory ? `&directory=${encodedDirectory}` : "");
 
-  const repoUrl = searchParams?.repoUrl || "N/A"; // Default to "N/A" if undefined
-  const branchName = searchParams?.branchName || "N/A"; // Default to "N/A" if undefined
+  const repoUrl = searchParams?.repoUrl || "N/A";
+  const branchName = searchParams?.branchName || "N/A";
+  const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const resData = await fetchResourceRequirements(searchParams?.repoUrl || "");
-        setResourceData(resData);
-
-        const recData = await fetchRecommendations(searchParams?.repoUrl || "", resData.cpu, resData.memory);
-        setRecommendationData(recData);
-
-        const cacheData = await fetchCache(searchParams?.repoUrl || "", searchParams?.branchName || "", searchParams?.directory || "");
-        setCacheData(cacheData);
-
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [searchParams]);
+  const cacheData = await fetchCache(gitBody);
+  const analysisData = await fetchAnalysisData(gitBody);
 
   return (
     <div className="mx-auto max-w-7xl p-6 bg-background border">
@@ -82,71 +92,28 @@ export default function Results({
       </CardHeader>
       <div className="flex flex-wrap -mx-2">
         <div className="w-full md:w-1/2 px-2">
-          <Suspense fallback={<LoadingComponent />}>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">
-                  Language Distribution
-                </CardTitle>
-              </CardHeader>
-              <LanguageDistribution
-                repoUrl={searchParams?.repoUrl || ""}
-                branchName={searchParams?.branchName || ""}
-                directory={searchParams?.directory || ""}
-              />
-            </Card>
-          </Suspense>
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">
+                Language Distribution
+              </CardTitle>
+            </CardHeader>
+            <LanguageDistribution data={analysisData} />
+          </Card>
         </div>
         <div className="w-full md:w-1/2 px-2">
-          <Suspense fallback={<LoadingComponent />}>
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">
-                  Resource Requirements
-                </CardTitle>
-              </CardHeader>
-              <ResourceRequirements
-                repoUrl={searchParams?.repoUrl || ""}
-                branchName={searchParams?.branchName || ""}
-                directory={searchParams?.directory || ""}
-              />
-            </Card>
-          </Suspense>
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">
+                Resource Requirements
+              </CardTitle>
+            </CardHeader>
+            {/* <ResourceRequirements data={analysisData} /> */}
+          </Card>
         </div>
-        {/* Split here */}
-        <div className="w-full md:w-1/2 px-2 mt-5">
-          <Suspense fallback={<LoadingComponent />}>
-            <Card className="mb-4">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">
-                  {" "}
-                  Instance Recommendations
-                </CardTitle>
-              </CardHeader>
-              <InstanceRecommendations
-                recommendationData={recommendationData} // Pass the fetched data
-              />
-            </Card>
-          </Suspense>
-        </div>
-        <div className="w-full md:w-1/2 px-2 mt-5">
-          <Suspense fallback={<LoadingComponent />}>
-            <Card className="mb-4">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold text-center">
-                  {" "}
-                  Cloud Score Costs
-                </CardTitle>
-              </CardHeader>
-              {/* Show Winner Instance, when Click show all */}
-              {/* <CloudCostInstances
-                repoUrl={searchParams?.repoUrl}
-                branchName={searchParams?.branchName}
-                directory={searchParams?.directory}
-              /> */}
-            </Card>
-          </Suspense>
-        </div>
+        <Suspense fallback={<LoadingComponent />}>
+          <LatestResults analysisData={analysisData} />
+        </Suspense>
       </div>
       <Link href={detailedPagePath}>
         <Button className="mt-6 w-full">Get All LLM Analysis</Button>
@@ -154,4 +121,3 @@ export default function Results({
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-import { fetchAnalysisData } from "@/app/lib/fetch";
 import { calculateScores } from "@/app/lib/score";
 import CloudScoreCard from "./cloud-cost-card";
 

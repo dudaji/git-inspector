@@ -5,10 +5,8 @@ import {
   CardTitle,
   CardContent,
 } from "@/app/components/ui/card";
-import { fetchResourceRequirements } from "@/app/lib/fetch";
 
 export async function ResourceRequirements({ repoUrl }: { repoUrl: string }) {
-  const requirements = await fetchResourceRequirements(repoUrl);
   return (
     <Card className="flex flex-col bg-secondary-background h-full">
       <CardHeader className="items-center pb-0">
