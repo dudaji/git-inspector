@@ -19,13 +19,13 @@ import { Colors, getHexColour } from "github-linguist-colours";
 
 interface LanguageDistributionProps {
   data: {
-    language_ratio?: Record<string, number>;
+    languageRatio?: Record<string, number>;
   };
 }
 
 export function LanguageDistribution({ data }: LanguageDistributionProps) {
-  console.log("Render languageDistribution with fetched data: ", data);
-  const languages = data?.language_ratio || {};
+  // console.log("Render languageDistribution with fetched data: ", data);
+  const languages = data?.languageRatio || {};
 
   const chartData = React.useMemo(
     () =>

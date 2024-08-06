@@ -3,8 +3,8 @@ import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
 // import LanguageDistribution from "@/app/components/step-1-language-distribution";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
-// import InstanceRecommendationsWithData from "@/app/components/step-3-instance-recommendations";
-// import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winner";
+import InstanceRecommendationsWithData from "@/app/components/step-3-instance-recommendations";
+import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winner";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { LoadingComponent } from "@/app/components/ui/loading";
@@ -50,7 +50,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
               Instance Recommendations
             </CardTitle>
           </CardHeader>
-          {/* <InstanceRecommendationsWithData recommendationData={instanceRecommendation} /> */}
+          <InstanceRecommendationsWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
         </Card>
       </div>
       <div className="w-full md:w-1/2 px-2 mt-5">
@@ -60,7 +60,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
               Cloud Score Costs
             </CardTitle>
           </CardHeader>
-          {/* <CloudCostInstancesWithData data={instanceRecommendation} /> */}
+          <CloudCostInstancesWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
         </Card>
       </div>
     </>

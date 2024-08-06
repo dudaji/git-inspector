@@ -8,6 +8,7 @@ const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
 export async function fetchAnalysisData({ repoUrl, branchName, directory }: GitBody) {
   if (repoUrl && branchName) {
     try {
+      console.log("Fecthing to... ", `${analysisEndpoint}/analyze-repo`);
       const body = { repoUrl, branchName, ...(directory && { directory }) };
       const response = await fetch(`${analysisEndpoint}/analyze-repo`, {
         method: "POST",
@@ -44,6 +45,7 @@ export async function fetchAnalysisData({ repoUrl, branchName, directory }: GitB
 // - Github 정보를 토대로 이전에 했던 기록이 있으면 기록 결과를 반환하고, 없으면 404에러
 export async function fetchCache({ repoUrl, branchName, directory }: GitBody) {
   try {
+    console.log("Fecthing to... ", analysisEndpoint);
     const body = { repoUrl, branchName, ...(directory && { directory }) };
     const response = await fetch(`${analysisEndpoint}/cache`, {
       method: "POST",

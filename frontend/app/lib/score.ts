@@ -1,28 +1,21 @@
 import { fileURLToPath } from "url";
-import { CloudInstance, Estimate, Scores, DetailedScore } from "@/app/types/model";
+import { CloudInstance, CloudProvider, RepoResult, Estimate, InstanceResult } from "@/app/types/model";
 
-export interface CloudProvider {
-  instance: CloudInstance;
-  estimate: Estimate;
-}
-
-// TODO??
+// Score interface only used in here
 export interface Score {
   cost: number;
   performance: number;
   environmentalImpact: number;
   total: number;
 }
-
 export function calculateScores(
-  results: Record<string, CloudProvider>,
+  results: Record<string, InstanceResult>,
 ): [string, Record<string, Score>] {
-  const { conclusion, language_ratio, ...filtered } = results;
   const scores: Record<string, Score> = {};
-  const costs = Object.values(filtered).map((p) => p.instance.costPerHour);
-  const cpus = Object.values(filtered).map((p) => p.instance.cpu);
-  const memories = Object.values(filtered).map((p) => p.instance.ram);
-  const carbonFootprints = Object.values(filtered).map((p) =>
+  const costs = Object.values(results).map((p) => p.instance.costPerHour);
+  const cpus = Object.values(results).map((p) => p.instance.cpu);
+  const memories = Object.values(results).map((p) => p.instance.ram);
+  const carbonFootprints = Object.values(results).map((p) =>
     parseFloat(p.estimate.carbonFootprint.split(" ")[0]),
   );
 
@@ -33,7 +26,7 @@ export function calculateScores(
   const minCarbon = Math.min(...carbonFootprints);
   const maxCarbon = Math.max(...carbonFootprints);
 
-  for (const [name, provider] of Object.entries(filtered)) {
+  for (const [name, provider] of Object.entries(results)) {
     const cost = provider.instance.costPerHour;
     const cpu = provider.instance.cpu;
     const memory = provider.instance.ram;
@@ -79,12 +72,11 @@ export function calculateScores(
 export function getMinInstanceCost(
   results: Record<string, CloudProvider>,
 ): [string, CloudInstance] {
-  const { conclusion, languageRatio, ...filtered } = results;
-  const costs = Object.values(filtered).map((p) => p.instance.costPerHour);
+  const costs = Object.values(results).map((p) => p.instance.costPerHour);
 
   const minCost = Math.min(...costs);
 
-  for (const [name, provider] of Object.entries(filtered)) {
+  for (const [name, provider] of Object.entries(results)) {
     if (provider.instance.costPerHour === minCost) {
       return [name, provider.instance];
     }

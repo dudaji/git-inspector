@@ -1,24 +1,34 @@
+"use client"; // 클라이언트 컴포넌트로 지정
+
+import React, { useState } from "react";
 import { calculateScores } from "@/app/lib/score";
 import CloudScoreCard from "./cloud-cost-card";
+import { Modal } from "@/app/components/ui/modal";
+import { CloudInstance, InstanceResult , RepoResult} from "@/app/types/model";
 
-interface CloudInstance {
-  name: string;
-  cpu: string;
-  memory: string;
-  gpu: string;
-  storage: string;
+
+interface CloudInstanceProps {
+  provider: string;
+  instance: CloudInstance;
+  estimate: {
+    powerConsumption: string;
+    carbonFootprint: string;
+    description: string;
+  };
+  onClick: () => void;
 }
+
+
 function ConclusionInstance({
   provider,
   instance,
-}: {
-  provider: string;
-  instance: CloudInstance;
-}) {
+  estimate,
+  onClick,
+}: CloudInstanceProps) {
   const formattedProvider =
     provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
   return (
-    <div key={`${provider}.${instance.name}`} className="mb-8">
+    <div key={`${provider}.${instance.name}`} className="mb-8 text-center">
       <h4 className="text-lg font-semibold">{`Recommended ${formattedProvider} Instance Setup`}</h4>
       <table className="table-auto w-full mb-4 mt-4">
         <tbody>
@@ -32,46 +42,66 @@ function ConclusionInstance({
           </tr>
           <tr>
             <td className="border px-4 py-2">Memory</td>
-            <td className="border px-4 py-2">{instance.memory}</td>
+            <td className="border px-4 py-2">{instance.ram}</td>
           </tr>
           <tr>
-            <td className="border px-4 py-2">Storage</td>
-            <td className="border px-4 py-2">{instance.storage}</td>
+            <td className="border px-4 py-2">Power Consumption</td>
+            <td className="border px-4 py-2">{estimate.powerConsumption}</td>
           </tr>
           <tr>
-            <td className="border px-4 py-2">GPU</td>
-            <td className="border px-4 py-2">{instance.gpu}</td>
+            <td className="border px-4 py-2">Carbon Footprint</td>
+            <td className="border px-4 py-2">{estimate.carbonFootprint}</td>
           </tr>
         </tbody>
       </table>
+      <button onClick={onClick} className="mt-4 text-blue-500 underline">
+        Show ALL
+      </button>
     </div>
   );
 }
 
-export default async function CloudCostInstances({
-  repoUrl,
-  branchName,
-  directory,
+const CloudCostInstances = ({
+  recommendationData,
+  analysisData,
 }: {
-  repoUrl?: string;
-  branchName?: string;
-  directory?: string;
-}) {
-  const result = await fetchAnalysisData(repoUrl, branchName, directory);
+  recommendationData: InstanceResult;
+  analysisData: RepoResult;
+}) => {
+  const [showDetails, setShowDetails] = useState(false);
 
-  if (result?.message) {
-    return (
-      <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
-        {`ERROR: ${result.message}`}
-      </div>
-    );
-  }
-
-  if (Object.keys(result).length == 0) {
+  if (!recommendationData || Object.keys(recommendationData).length === 0) {
     return <p>No results available.</p>;
   }
 
-  const [winner, scores] = calculateScores(result);
+  const transformedAnalysisData: Record<string, InstanceResult> = {
+    gcp: {
+      instance: analysisData.gcp,
+      estimate: {
+        powerConsumption: "",
+        carbonFootprint: "",
+        description: "",
+      },
+    },
+    aws: {
+      instance: analysisData.aws,
+      estimate: {
+        powerConsumption: "",
+        carbonFootprint: "",
+        description: "",
+      },
+    },
+    azure: {
+      instance: analysisData.azure,
+      estimate: {
+        powerConsumption: "",
+        carbonFootprint: "",
+        description: "",
+      },
+    },
+  };
+
+  const [winner, scores] = calculateScores(transformedAnalysisData);
 
   return (
     <div>
@@ -81,15 +111,54 @@ export default async function CloudCostInstances({
           <CloudScoreCard
             key={providerName}
             provider={providerName}
-            winner={providerName == winner}
+            winner={providerName === winner}
             score={score}
           />
         ))}
       <ConclusionInstance
         provider={winner}
-        instance={result[winner].instance}
+        instance={transformedAnalysisData[winner].instance}
+        estimate={transformedAnalysisData[winner].estimate}
+        onClick={() => setShowDetails(true)}
       />
-      <p>{result["conclusion"].description}</p>
+       <Modal isVisible={showDetails} onClose={() => setShowDetails(false)}>
+        {Object.keys(transformedAnalysisData).map((provider) => {
+          if (provider === 'languageRatio') return null;
+          const data = transformedAnalysisData[provider];
+          return (
+            <div key={provider} className="p-4">
+              <h4 className="text-xl font-semibold text-center">{`${provider.toUpperCase()}`}</h4>
+              <table className="table-auto w-full mb-4 mt-4">
+                <tbody>
+                  <tr>
+                    <td className="border px-4 py-2 w-1/2">Instance Name</td>
+                    <td className="border px-4 py-2 w-1/2">{data.instance.name}</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-4 py-2 w-1/2">CPU</td>
+                    <td className="border px-4 py-2 w-1/2">{data.instance.cpu}</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-4 py-2 w-1/2">Memory</td>
+                    <td className="border px-4 py-2 w-1/2">{data.instance.ram}</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-4 py-2 w-1/2">Power Consumption</td>
+                    <td className="border px-4 py-2 w-1/2">{data.estimate.powerConsumption}</td>
+                  </tr>
+                  <tr>
+                    <td className="border px-4 py-2 w-1/2">Carbon Footprint</td>
+                    <td className="border px-4 py-2 w-1/2">{data.estimate.carbonFootprint}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="mb-4">{data.estimate.description}</p>
+            </div>
+          );
+        })}
+      </Modal>
     </div>
   );
-}
+};
+
+export default CloudCostInstances;

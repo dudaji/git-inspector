@@ -5,7 +5,7 @@ import {
   CardTitle,
   CardContent,
 } from "@/app/components/ui/card";
-import { RepoResult } from "@/app/types/model";
+import { RepoResult, CloudInstance } from "@/app/types/model";
 
 interface ResourceRequirementsProps {
   data: RepoResult;
@@ -15,9 +15,14 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
   const getMinimumValues = () => {
     if (!data) return { minCpu: null, minMemory: null };
 
-    const instances = Object.values(data).filter(instance => instance.instance);
-    const minCpu = Math.min(...instances.map(instance => parseFloat(instance.instance.cpu)));
-    const minMemory = Math.min(...instances.map(instance => parseFloat(instance.instance.memory)));
+    const instances: CloudInstance[] = [
+      data.gcp,
+      data.aws,
+      data.azure,
+    ];
+
+    const minCpu = Math.min(...instances.map(instance => instance.cpu));
+    const minMemory = Math.min(...instances.map(instance => instance.ram));
     console.log("resource requirements parsing :", minCpu, minMemory);
     return { minCpu, minMemory };
   };
@@ -29,7 +34,7 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
         <CardTitle>Minimum Resources to Run</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center h-full">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center">
           <div className="text-4xl font-bold text-primary">
             {minCpu !== null ? minCpu : "N/A"}
           </div>
