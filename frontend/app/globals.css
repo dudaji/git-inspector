@@ -4,62 +4,74 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 220.9 39.3% 11%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    --background: 0 0% 10%; /* 어두운 회색 */
+    --foreground: 200 50% 90%; /* 밝은 하늘색 글자 */
+    --card: 220 100% 15%; /* 어두운 파란색 카드 */
+    --card-foreground: 200 100% 90%; /* 밝은 하늘색 카드 글자 */
+    --popover: 220 100% 20%; /* 어두운 파란색 팝오버 */
+    --popover-foreground: 190 100% 90%; /* 밝은 하늘색 팝오버 글자 */
+    --primary: 215 100% 75%; 
+    --primary-foreground: 215 100% 10%; 
+    --secondary: 220 100% 20%; /* 어두운 파란색 */
+    --secondary-foreground: 190 100% 75%; /* 형광 파란색 */
+    --background: 0 0% 10%; /* 어두운 회색 */
+    --muted-foreground: 190 100% 75%; /* 형광 파란색 */
+    --accent: 180 100% 75%; /* 형광 파란색 */
+    --accent-foreground: 180 100% 10%; /* 어두운 파란색 */
+    --destructive: 0 100% 50%; /* 빨간색 */
+    --destructive-foreground: 220 100% 10%; /* 어두운 파란색 */
+    --border: 190 100% 20%; /* 어두운 파란색 */
+    --input: 190 90% 20%; /* 어두운 파란색 */
+    --ring: 190 100% 75%; /* 형광 파란색 */
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --winner: #fefcbf;
-  }
-
-  .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --winner: #5a67d8;
+    --chart-1: 190 100% 75%; /* 형광 파란색 */
+    --chart-2: 0 0% 100%; /* 흰색 */
+    --chart-3: 220 100% 30%; /* 어두운 파란색 */
+    --chart-4: 190 100% 65%; /* 밝은 파란색 */
+    --chart-5: 190 100% 85%; /* 매우 밝은 파란색 */
+    --winner: #0800ff31; /* 파랑~보라 색 */
+    --plasma: 190 100% 75%; /* 형광 파란색 */
   }
 }
+
+input::placeholder {
+  color: hsl(var(--primary) / 0.7); /* 형광 파란색 투명도 70% */
+  filter: blur(0.9px); /* 블러 효과 */
+  opacity: 0.3; /* 약간 흐리게 */
+}
+
+input:focus::placeholder {
+  filter: none; /* 포커스가 있을 때는 블러 효과 제거 */
+  opacity: 1; /* 포커스가 있을 때는 완전히 보이게 */
+}
+  /* .dark {
+    --background: 0 0% 10%;
+    --foreground: 60 100% 50%;
+    --card: 0 0% 30%;
+    --card-foreground: 60 100% 50%;
+    --popover: 0 0% 20%;
+    --popover-foreground: 60 100% 50%;
+    --primary: 60 100% 50%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 60 100% 50%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 60 100% 50%;
+    --accent: 60 100% 50%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 10%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 60 100% 50%;
+    --chart-1: 60 100% 50%;
+    --chart-2: 0 0% 100%;
+    --chart-3: 0 0% 30%;
+    --chart-4: 60 100% 40%;
+    --chart-5: 60 100% 60%;
+    --winner: #FFFF00;
+  } */
+
 
 @layer base {
   * {
@@ -68,5 +80,72 @@
   body {
     @apply bg-background text-foreground;
   }
+  a {
+    @apply text-primary;
+  }
+  header, footer {
+    @apply bg-card text-card-foreground;
+  }
+  main {
+    @apply bg-background text-foreground;
+  }
 }
 
+@layer components {
+  .plasma-effect {
+    @apply absolute inset-0 pointer-events-none overflow-hidden;
+  }
+  .plasma-line {
+    stroke: hsl(var(--primary) / 0.3); /* 형광 파란색 */
+    stroke-width: 1;
+    filter: drop-shadow(0 0 10px hsl(var(--plasma) / 0.7));
+    animation: plasma-flash var(--duration, 10s) infinite var(--delay, 10s);
+  }
+  .loading-icon {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+  }
+  .progress-bar {
+    width: 100%;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background-color: #fff;
+    animation: progress 3s ease-in-out infinite;
+  }
+}
+
+@keyframes plasma-flash {
+  0%, 100% { opacity: 0; }
+  5%, 10% { opacity: 0.9; }
+  15% { opacity: 0.3; }
+  20%, 25% { opacity: 0.8; }
+  30%, 100% { opacity: 0; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes progress {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+/* 
+stroke: hsl(var(--plasma) / 0.5): 플라즈마 선의 색상과 투명도 (0.5는 50% 투명)
+stroke-width: 2: 플라즈마 선의 두께
+filter: drop-shadow(0 0 10px hsl(var(--plasma) / 0.5)): 플라즈마 선의 그림자 효과 (10px는 그림자 크기, 0.5는 그림자 투명도)
+animation: plasma-flash var(--duration, 1s) infinite var(--delay, 5s): 애니메이션 설정 (기본 지속 시간 1초, 기본 지연 시간 5초)
+@keyframes plasma-flash: 애니메이션 중 불투명도 변화 (0.5에서 0.7로)
+
+*/

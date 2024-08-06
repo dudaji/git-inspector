@@ -54,7 +54,38 @@ const config: Config = {
       md: "calc(var(--radius) - 2px)",
       sm: "calc(var(--radius) - 4px)",
     },
+    animation: {
+      rotate: 'rotate 7s linear infinite',
+      bounce: 'bounce 2s infinite',
+      pulse: 'pulse 2s infinite',
+      'plasma-1': 'plasma 2s infinite',
+      'plasma-2': 'plasma 2.5s infinite',
+      'plasma-3': 'plasma 3s infinite',
+      spin: 'spin 1s ease-in-out infinite',
+      progress: 'progress 3s ease-in-out infinite',
+      blink: 'blink 1s step-end infinite',
+    },
     keyframes: {
+      rotate: {
+        '0%': { transform: 'rotate(0deg) scale(7)' },
+        '100%': { transform: 'rotate(-360deg) scale(7)' },
+      },
+      bounce: {
+        '0%, 100%': { transform: 'translateY(-25%)', animationTimingFunction: 'cubic-bezier(0.8,0,1,1)' },
+        '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0,0,0.2,1)' },
+      },
+      pulse: {
+        '0%, 100%': { opacity: "1" },
+        '50%': { opacity: "0.5" },
+      },
+      plasma: {
+        '0%, 100%': { opacity: '0.1' },
+        '50%': { opacity: '1' },
+      },
+      "pulse-border": {
+        '0%, 100%': { boxShadow: '0 0 15px FFFF00' },
+        '50%': { boxShadow: '0 0 30px FFFF00' },
+      },
       "accordion-down": {
         from: {
           height: "0",
@@ -70,6 +101,18 @@ const config: Config = {
         to: {
           height: "0",
         },
+      },
+      spin: {
+        '0%': { transform: 'rotate(0deg)' },
+        '100%': { transform: 'rotate(360deg)' },
+      },
+      progress: {
+        '0%': { width: '0%' },
+        '100%': { width: '100%' },
+      },
+      blink: {
+        '0%, 100%': { opacity: '1' },
+        '50%': { opacity: '0' },
       },
     },
   },

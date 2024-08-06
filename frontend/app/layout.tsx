@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { PlasmaEffect } from './components/ui/plasma';
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
     url: "https://git-inspector-nextjs14--gpu-brokerage.us-central1.hosted.app/",
     images: [
       {
-        url: "assets/images/512.png",
+        url: "/assets/images/512.png",
         width: 512,
         height: 512,
         alt: "Git Watt Icon",
@@ -52,11 +54,11 @@ export default function RootLayout({
           <header className="bg-muted p-4">
             <nav className="container mx-auto flex items-center justify-between">
               <Link href="/" className="text-lg font-bold" prefetch={false}>
-                Git Watt
+                GitWatt 
               </Link>
             </nav>
           </header>
-          <main className="flex-1 py-12">{children}</main>
+          <main className="flex-1 py-12 relative"><PlasmaEffect/>{children}</main>
           <footer className="bg-muted p-4 text-center text-muted-foreground">
             <div className="container mx-auto">
               &copy; 2024 Git Watt. All rights reserved.

@@ -31,13 +31,16 @@ import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { useRouter } from "next/navigation";
-// import Link from "next/link";
+import { TypingText } from "./ui/typing";
+// import Image from 'next/image';
+// import Loading from '../../app/assets/images/loading-blue.gif'
+import { LoadingComponent } from "./ui/loading";
 
 export function GitRepoAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [repoUrl, setRepoUrl] = useState("");
-  const [branchName, setBranchName] = useState("main");
+  const [branchName, setBranchName] = useState("");
   const [directory, setDirectory] = useState("");
   const router = useRouter();
 
@@ -54,8 +57,10 @@ export function GitRepoAnalyzer() {
         `/results?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
         (directory ? `&directory=${encodedDirectory}` : "");
 
-      router.push(path);
-      setLoading(false);
+      setTimeout(() => {
+        router.push(path);
+        // setLoading(false);
+      }, 3000); // 최소 5초 동안 로딩 상태 유지(개발용)
     } catch (err) {
       setLoading(false);
       if (err instanceof Error) {
@@ -65,65 +70,74 @@ export function GitRepoAnalyzer() {
       }
     }
   };
+
   return (
-    <Card className="mx-auto max-w-md p-6 bg-background border">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
-        <CardDescription className="text-muted-foreground">
-          Enter a repository URL, branch name and code directory to analyze.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <Label htmlFor="repo-url">Repository URL</Label>
-            <Input
-              id="repo-url"
-              placeholder="https://github.com/user/repo.git"
-              required
-              value={repoUrl}
-              onChange={(e) => setRepoUrl(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="branch-name">Branch Name</Label>
-            <Input
-              id="branch-name"
-              placeholder="main"
-              required
-              value={branchName}
-              onChange={(e) => setBranchName(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 mt-4">
-            <Label htmlFor="directory">Directory</Label>
-            <Input
-              id="directory"
-              placeholder=""
-              value={directory}
-              onChange={(e) => setDirectory(e.target.value)}
-            />
-          </div>
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <div className="h-8 w-8 animate-spin" />
-              <div className="text-muted-foreground">Loading...</div>
-              <div className="text-sm text-muted-foreground">
-                This may take a few seconds...
+    <div className="relative mx-auto max-w-md p-[1.5px] rounded-full overflow-hidden">
+     <div className="animate-rotate absolute inset-0 h-full w-full rounded-full bg-[conic-gradient(#FFFFFF_30deg,transparent_1200deg)]"></div>
+      <Card className="relative p-6 bg-background rounded-full">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
+          <CardDescription className="text-muted-foreground">
+            Enter a Git Repo URL, Branch name to inspect
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={handleSubmit}>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="repo-url">
+                Repository URL <span>*</span>
+              </Label>
+              <Input
+                id="repo-url"
+                placeholder="https://your-git-repository"
+                required
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                />
+            </div>
+            <div className="space-y-2 mt-4">
+              <Label htmlFor="branch-name">
+                Branch Name <span>*</span>
+              </Label>
+              <Input
+                id="branch-name"
+                placeholder="main"
+                required
+                value={branchName}
+                onChange={(e) => setBranchName(e.target.value)}
+                />
+            </div>
+            <div className="space-y-2 mt-4">
+                <Label htmlFor="directory">
+                  Directory <span>(Optional)</span>
+                </Label>
+              <Input
+                id="directory"
+                placeholder="Optional"
+                value={directory}
+                onChange={(e) => setDirectory(e.target.value)}
+                />
+            </div>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-4">
+                <LoadingComponent/>
               </div>
-            </div>
-          ) : (
-            <Button type="submit" className="mt-6 w-full">
-              Analyze Repository
-            </Button>
-          )}
-          {error && (
-            <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
-              {error}
-            </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+            ) : (
+              <div className="relative mt-6 w-full animate-pulse-border">
+                <div className="absolute inset-0 animate-pulse-border rounded-lg"></div>
+                <Button type="submit" className="relative w-full">
+                  Analyze Repository
+                </Button>
+              </div>
+            )}
+            {error && (
+              <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
+                {error}
+              </div>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

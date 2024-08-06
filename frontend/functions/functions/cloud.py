@@ -1,8 +1,13 @@
 import hashlib
+from firebase_functions import https_fn
 import os
 import json
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from firebase_functions import https_fn
+from functions.analyzer.calculator import (
+    estimate_environment,
+    estimate_environment_mock,
+)
 from functions.analyzer.full_analyzer import (
     FinalResponse,
     analyze_full_steps,
@@ -12,9 +17,15 @@ from functions.analyzer.full_analyzer import (
 from dotenv import load_dotenv
 from firebase_functions import https_fn
 
+from functions.analyzer.instance_selector import select_best_instance
 from functions.analyzer.model import Scores, DetailedScore
+from functions.analyzer.parser import Instance, InstanceResult, RepoResult
 from functions.firestore import check_cache, save_to_firestore
 from functions.git import get_latest_commit_sha
+
+from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
+
+from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
 
 load_dotenv()
 os.environ["LANGCHAIN_PROJECT"] = "Git Analyzer"
@@ -102,7 +113,19 @@ def calculate_scores(results: FinalResponse) -> Scores:
     )
 
 
-def analyze(request: https_fn.Request) -> dict:
+def get_repo_info(
+    repo_url: str, branch: str = "main", directory: str = ""
+) -> Tuple[str, dict, str]:
+    repo_path, commit_hash = get_latest_commit_sha(repo_url, branch)
+    hash_key = get_gemini_analysis_key(repo_url, branch, directory, commit_hash)
+
+    if cache := check_cache(hash_key):
+        print("Cache hit")
+        return None, cache, hash_key
+    return repo_path, None, hash_key
+
+
+def get_repo_body(request: https_fn.Request) -> Tuple[str, str, str]:
     body = request.get_json(silent=True)
     print(body)
 
@@ -110,19 +133,64 @@ def analyze(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
 
-    repo_path, commit_hash = get_latest_commit_sha(repo_url, branch)
-    hash_key = get_gemini_analysis_key(repo_url, branch, directory, commit_hash)
+    return repo_url, branch, directory
 
-    if cache := check_cache(hash_key):
-        print("Cache hit")
+
+def get_cache(request: https_fn.Request) -> dict | None:
+    repo_url, branch, directory = get_repo_body(request)
+    _, cache, _ = get_repo_info(repo_url, branch, directory)
+    if cache:
         return cache
+    return None
+
+
+def analyze(request: https_fn.Request) -> dict:
+    repo_url, branch, directory = get_repo_body(request)
+
+    repo_path, cache, hash_key = get_repo_info(repo_url, branch, directory)
+    if cache:
+        return json.dumps(cache)
 
     print("Analysis start")
     result = analyze_full_steps(repo_path, directory)
     # result = analyze_with_mock(repo_path, directory)
     scores = calculate_scores(result)
-    result_dict = json.loads(result.json())
-    save_to_firestore(hash_key, repo_url, branch, directory, result_dict, scores)
+    save_to_firestore(
+        hash_key, repo_url, branch, directory, json.loads(result.json()), scores
+    )
 
     print("Analyzed Results", result)
-    return result_dict
+    return result.dict(by_alias=True)
+
+
+def repo_analyzer(request: https_fn.Request) -> dict:
+    body = request.get_json(silent=True)
+
+    repo_url = body.get("repoUrl")
+    branch = body.get("branchName", "main")
+    directory = body.get("directory", "")
+    repo_path, _ = get_latest_commit_sha(repo_url, branch)
+    return analyze_repo_mock(repo_path, directory).dict(by_alias=True)
+
+
+def environment_analyzer(request: https_fn.Request) -> dict:
+    body = request.get_json(silent=True)
+
+    aws_instance = Instance(**body.get("aws"))
+    gcp_instance = Instance(**body.get("gcp"))
+    azure_instance = Instance(**body.get("azure"))
+
+    return estimate_environment_mock(aws_instance, gcp_instance, azure_instance).dict(
+        by_alias=True
+    )
+
+
+def get_best_instance(request: https_fn.Request) -> dict:
+    body = request.get_json(silent=True)
+
+    aws_instance = InstanceResult(**body.get("aws"))
+    gcp_instance = InstanceResult(**body.get("gcp"))
+    azure_instance = InstanceResult(**body.get("azure"))
+    instance_results = [aws_instance, gcp_instance, azure_instance]
+    best_instance = select_best_instance(instance_results)
+    return best_instance.dict(by_alias=True)

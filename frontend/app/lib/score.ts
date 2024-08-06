@@ -1,41 +1,23 @@
-export interface CloudProvider {
-  instance: {
-    cpu: string;
-    memory: string;
-    gpu: string;
-  };
-  pricing: {
-    monthly: string;
-  };
-  carbon_footprint: {
-    monthly: string;
-  };
-}
+import { fileURLToPath } from "url";
+import { CloudInstance, CloudProvider, RepoResult, Estimate, InstanceResult } from "@/app/types/model";
 
+// Score interface only used in here
 export interface Score {
   cost: number;
   performance: number;
   environmentalImpact: number;
   total: number;
 }
-
 export function calculateScores(
-  results: Record<string, CloudProvider>,
+  results: Record<string, InstanceResult>,
 ): [string, Record<string, Score>] {
-  const { conclusion, ...filtered } = results;
+  console.log("calculate scores from :", results)
   const scores: Record<string, Score> = {};
-
-  const costs = Object.values(filtered).map((p) =>
-    parseFloat(p.pricing.monthly.replace("$", "")),
-  );
-  const cpus = Object.values(filtered).map((p) =>
-    parseInt(p.instance.cpu.split(" ")[0]),
-  );
-  const memories = Object.values(filtered).map((p) =>
-    parseFloat(p.instance.memory.split(" ")[0]),
-  );
-  const carbonFootprints = Object.values(filtered).map((p) =>
-    parseFloat(p.carbon_footprint.monthly.split(" ")[0]),
+  const costs = Object.values(results).map((p) => p.instance.costPerHour);
+  const cpus = Object.values(results).map((p) => p.instance.cpu);
+  const memories = Object.values(results).map((p) => p.instance.ram);
+  const carbonFootprints = Object.values(results).map((p) =>
+    parseFloat(p.estimate.carbonFootprint.split(" ")[0]),
   );
 
   const minCost = Math.min(...costs);
@@ -44,15 +26,17 @@ export function calculateScores(
   const maxMemory = Math.max(...memories);
   const minCarbon = Math.min(...carbonFootprints);
   const maxCarbon = Math.max(...carbonFootprints);
+  console.log("calculate from reuslt : ", results);
 
-  for (const [name, provider] of Object.entries(filtered)) {
-    const cost = parseFloat(provider.pricing.monthly.replace("$", ""));
-    const cpu = parseInt(provider.instance.cpu.split(" ")[0]);
-    const memory = parseFloat(provider.instance.memory.split(" ")[0]);
+  for (const [name, provider] of Object.entries(results)) {
+    const cost = provider.instance.costPerHour;
+    const cpu = provider.instance.cpu;
+    const memory = provider.instance.ram;
     const carbonFootprint = parseFloat(
-      provider.carbon_footprint.monthly.split(" ")[0],
+      provider.estimate.carbonFootprint.split(" ")[0],
     );
-    const hasGPU = provider.instance.gpu != "None";
+    const hasGPU =
+      provider.instance.gpu != null && provider.instance.gpu !== "None";
 
     const costScore = 40 - ((cost - minCost) / (maxCost - minCost)) * 30;
 
@@ -82,4 +66,23 @@ export function calculateScores(
   }, Object.keys(scores)[0]);
 
   return [winner, scores];
+}
+
+
+
+// 새로 추가된 최소 비용 인스턴스 반환 함수
+export function getMinInstanceCost(
+  results: Record<string, CloudProvider>,
+): [string, CloudInstance] {
+  const costs = Object.values(results).map((p) => p.instance.costPerHour);
+
+  const minCost = Math.min(...costs);
+
+  for (const [name, provider] of Object.entries(results)) {
+    if (provider.instance.costPerHour === minCost) {
+      return [name, provider.instance];
+    }
+  }
+
+  throw new Error("No minimum cost instance found");
 }

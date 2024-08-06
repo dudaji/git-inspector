@@ -1,24 +1,73 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/app/components/ui/card";
-import AnalysisResults from "@/app/components/analysis-result";
-import { Suspense } from "react";
-import { LanguageDistribution } from "@/app/components/language-distribution";
+import React, { Suspense } from 'react';
+import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
+// import LanguageDistribution from "@/app/components/step-1-language-distribution";
+import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
+import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
+import InstanceRecommendationsWithData from "@/app/components/step-3-instance-recommendations";
+import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winner";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
+import { LoadingComponent } from "@/app/components/ui/loading";
+import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch_steps";
+import { GitBody, EnvBody, AnalyzeInstanceBody, InstanceResult, CloudInstance , FinalResponse} from "@/app/types/model";
 
-export default function Results({
-  searchParams,
-}: {
-  searchParams?: {
-    repoUrl?: string;
-    branchName?: string;
-    directory?: string;
-  };
-}) {
+type SearchParams = {
+  repoUrl?: string;
+  branchName?: string;
+  directory?: string;
+};
+
+async function LatestResults({ analysisData }: { analysisData: any }) {
+  console.log("get data from before steps:", analysisData);
+  const resourceRequirements = await fetchResourceRequirements({
+    aws: analysisData.aws as CloudInstance,
+    gcp: analysisData.gcp as CloudInstance,
+    azure: analysisData.azure as CloudInstance,
+  });
+
+  const instanceRecommendation = await fetchRecommendations({
+    aws: {
+      instance: analysisData.aws as CloudInstance,
+      estimate: resourceRequirements.aws as InstanceResult["estimate"],
+    },
+    gcp: {
+      instance: analysisData.gcp as CloudInstance,
+      estimate: resourceRequirements.gcp as InstanceResult["estimate"],
+    },
+    azure: {
+      instance: analysisData.azure as CloudInstance,
+      estimate: resourceRequirements.azure as InstanceResult["estimate"],
+    },
+  });
+  // console.log("Fetched instance recommendations:", instanceRecommendation);
+
+  return (
+    <>
+      <div className="w-full md:w-1/2 px-2 mt-5">
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-center">
+              Cloud Instance Recommendation
+            </CardTitle>
+          </CardHeader>
+          <InstanceRecommendationsWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
+        </Card>
+      </div>
+      <div className="w-full md:w-1/2 px-2 mt-5">
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-center">
+              Instance Scores
+            </CardTitle>
+          </CardHeader>
+          <CloudCostInstancesWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
+        </Card>
+      </div>
+    </>
+  );
+}
+
+export default async function ResultsPage({ searchParams }: { searchParams: SearchParams }) {
   const encodedRepoUrl = encodeURIComponent(searchParams?.repoUrl || "");
   const encodedBranchName = encodeURIComponent(searchParams?.branchName || "");
   const encodedDirectory = encodeURIComponent(searchParams?.directory || "");
@@ -26,42 +75,66 @@ export default function Results({
     `/results-detail?repoUrl=${encodedRepoUrl}&branchName=${encodedBranchName}` +
     (encodedDirectory ? `&directory=${encodedDirectory}` : "");
 
+  const repoUrl = searchParams?.repoUrl || "N/A";
+  const branchName = searchParams?.branchName || "N/A";
+  const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
+
+  console.log("Fetching cache data for:", gitBody);
+  let analysisData;
+  try { 
+    const cacheData = await fetchCache(gitBody);
+    console.log("Fetched cache data:", cacheData);
+
+    if (cacheData && !cacheData.errors && cacheData.message !== "Cache not found") {
+      console.log("Using cached data:", cacheData);
+      analysisData = cacheData;
+    } else {
+      throw new Error("Cache not found or has errors");
+     }
+    } catch (error) {
+      console.log("Fetching analysis data for:", gitBody);
+      analysisData = await fetchAnalysisData(gitBody);
+      console.log("Fetched analysis data:", analysisData);
+    }
+
   return (
-    <Card className="mx-auto max-w-2xl p-6 bg-background border">
+    <div className="mx-auto max-w-7xl p-6 bg-background border">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold">Analysis Results</CardTitle>
+        <CardTitle className="text-2xl font-bold">
+          Analysis Results of branch
+          <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
+          in
+          <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Suspense
-          fallback={
-            <div className="flex flex-col items-center justify-center py-8 space-y-4">
-              <div className="h-8 w-8 animate-spin" />
-              <div className="text-muted-foreground">Loading...</div>
-              <div className="text-sm text-muted-foreground">
-                This may take a few seconds...
-              </div>
-            </div>
-          }
-        >
-          <LanguageDistribution
-            languages={{
-              JavaScript: 1500,
-              TypeScript: 800,
-              HTML: 400,
-              CSS: 200,
-              Python: 100,
-            }}
-          />
-          <AnalysisResults
-            repoUrl={searchParams?.repoUrl}
-            branchName={searchParams?.branchName}
-            directory={searchParams?.directory}
-          />
+      <div className="flex flex-wrap -mx-2">
+        <div className="w-full md:w-1/2 px-2">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">
+                Language Distribution
+              </CardTitle>
+            </CardHeader>
+            <LanguageDistribution data={analysisData} />
+          </Card>
+        </div>
+        <div className="w-full md:w-1/2 px-2">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-center">
+                Resource Requirements
+              </CardTitle>
+            </CardHeader>
+            <ResourceRequirements data={analysisData} />
+          </Card>
+        </div>
+        <Suspense fallback={<LoadingComponent />}>
+          <LatestResults analysisData={analysisData} />
         </Suspense>
-        <Link href={detailedPagePath}>
-          <Button className="mt-6 w-full">Detailed Analysis</Button>
-        </Link>
-      </CardContent>
-    </Card>
+      </div>
+      <Link href={detailedPagePath}>
+        <Button className="mt-6 w-full">Get All LLM Analysis</Button>
+      </Link>
+    </div>
   );
 }

@@ -5,6 +5,8 @@ REPO_DIR = "repo"
 
 
 def get_latest_commit_sha(repo_url: str, branch: str) -> Tuple[str, str]:
+    if repo_url.endswith("/"):
+        repo_url = repo_url[:-1]
     project_name = repo_url.split("/")[-1].split(".")[0]
     repo_path = f"{REPO_DIR}/{project_name}"
     if not os.path.exists(repo_path):
