@@ -125,8 +125,10 @@ export async function fetchRecommendations(analyzeInstanceBody: AnalyzeInstanceB
     if (!response.ok) {
       throw new Error("Failed to fetch recommendations");
     }
+    const data = await response.json();
+    console.log("Fetched recommendations:", data);
 
-    return await response.json();
+    return data;
   } catch (err) {
     if (err instanceof Error) {
       return {

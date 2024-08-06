@@ -11,6 +11,7 @@ export interface Score {
 export function calculateScores(
   results: Record<string, InstanceResult>,
 ): [string, Record<string, Score>] {
+  console.log("calculate scores from :", results)
   const scores: Record<string, Score> = {};
   const costs = Object.values(results).map((p) => p.instance.costPerHour);
   const cpus = Object.values(results).map((p) => p.instance.cpu);
@@ -25,6 +26,7 @@ export function calculateScores(
   const maxMemory = Math.max(...memories);
   const minCarbon = Math.min(...carbonFootprints);
   const maxCarbon = Math.max(...carbonFootprints);
+  console.log("calculate from reuslt : ", results);
 
   for (const [name, provider] of Object.entries(results)) {
     const cost = provider.instance.costPerHour;

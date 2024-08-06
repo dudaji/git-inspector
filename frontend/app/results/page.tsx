@@ -39,7 +39,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
       estimate: resourceRequirements.azure as InstanceResult["estimate"],
     },
   });
-  console.log("Fetched instance recommendations:", instanceRecommendation);
+  // console.log("Fetched instance recommendations:", instanceRecommendation);
 
   return (
     <>
@@ -47,7 +47,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
         <Card className="mb-4">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-center">
-              Instance Recommendations
+              Cloud Instance Recommendation
             </CardTitle>
           </CardHeader>
           <InstanceRecommendationsWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
@@ -57,7 +57,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
         <Card className="mb-4">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-center">
-              Cloud Score Costs
+              Instance Scores
             </CardTitle>
           </CardHeader>
           <CloudCostInstancesWithData recommendationData={instanceRecommendation} analysisData={analysisData} />

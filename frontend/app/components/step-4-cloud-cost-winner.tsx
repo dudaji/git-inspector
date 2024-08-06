@@ -6,7 +6,6 @@ import CloudScoreCard from "./cloud-cost-card";
 import { Modal } from "@/app/components/ui/modal";
 import { CloudInstance, InstanceResult , RepoResult} from "@/app/types/model";
 
-
 interface CloudInstanceProps {
   provider: string;
   instance: CloudInstance;
@@ -26,10 +25,10 @@ function ConclusionInstance({
   onClick,
 }: CloudInstanceProps) {
   const formattedProvider =
-    provider.charAt(0).toUpperCase() + provider.slice(1).toLowerCase();
+    provider.toUpperCase();
   return (
     <div key={`${provider}.${instance.name}`} className="mb-8 text-center">
-      <h4 className="text-lg font-semibold">{`Recommended ${formattedProvider} Instance Setup`}</h4>
+      <h4 className="text-lg font-semibold">{`Recommended ${formattedProvider}`}</h4>
       <table className="table-auto w-full mb-4 mt-4">
         <tbody>
           <tr>
@@ -54,9 +53,6 @@ function ConclusionInstance({
           </tr>
         </tbody>
       </table>
-      <button onClick={onClick} className="mt-4 text-blue-500 underline">
-        Show ALL
-      </button>
     </div>
   );
 }
@@ -68,8 +64,8 @@ const CloudCostInstances = ({
   recommendationData: InstanceResult;
   analysisData: RepoResult;
 }) => {
-  const [showScoreList, setShowScoreList] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  // const [showScoreList, setShowScoreList] = useState(false);
+  // const [showDetails, setShowDetails] = useState(false);
 
   if (!recommendationData || Object.keys(recommendationData).length === 0) {
     return <p>No results available.</p>;
@@ -92,7 +88,6 @@ const CloudCostInstances = ({
     return maxKey
   }
   
-      
 
   const transformedAnalysisData: Record<string, InstanceResult> = {
     gcp: {
@@ -122,6 +117,7 @@ const CloudCostInstances = ({
   };
 
   const [winner, scores] = calculateScores(transformedAnalysisData);
+  console.log("Get winner and scoes: ", winner, scores)
   const bestProviderName = getMaxTotalScore(scores)
   return (
     <div>
@@ -131,7 +127,7 @@ const CloudCostInstances = ({
         winner={bestProviderName === winner}
         score={scores[bestProviderName]}
       />
-      <button onClick={() => {setShowScoreList(true)}} className="mt-4 text-blue-500 underline">
+      {/* <button onClick={() => {setShowScoreList(true)}} className="mt-4 text-blue-500 underline">
         Show All Scores
       </button>
       <Modal isVisible={showScoreList} onClose={() => setShowScoreList(false)}>
@@ -185,7 +181,7 @@ const CloudCostInstances = ({
             </div>
           );
         })}
-      </Modal>
+      </Modal> */}
     </div>
   );
 };

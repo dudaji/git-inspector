@@ -28,7 +28,7 @@ const CloudScoreCard: React.FC<CloudScoreCardProps> = ({
       <h2 className="text-2xl font-bold mb-4">
         {provider.toUpperCase()}
         {winner && (
-          <span className="ml-2 bg-yellow-500 text-white text-sm font-bold px-2 py-1 rounded">
+          <span className="ml-2 bg-secondary text-white text-sm font-bold px-2 py-1 rounded">
             Winner 🏆
           </span>
         )}

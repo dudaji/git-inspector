@@ -1,4 +1,5 @@
 import * as React from "react"
+import { Button } from "@/app/components/ui/button";
 
 interface ModalProps {
   isVisible: boolean;
@@ -13,10 +14,10 @@ const Modal = ({ isVisible, onClose, children }: ModalProps) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">
-      <div className="p-6 rounded-lg shadow-lg w-full max-w-3xl bg-primary-foreground">
-        <button onClick={onClose} className="float-right text-gray-700">
+      <div className="p-6 rounded-lg shadow-lg w-2/5 max-w-3xl bg-primary-foreground">
+        <Button onClick={onClose} className="float-right text-gray-700">
           &times;
-        </button>
+        </Button>
         {children}
       </div>
     </div>
