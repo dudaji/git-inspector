@@ -1,5 +1,6 @@
-"use client";
 
+"use client";
+// NOTE : Need to Render in Client Sides
 import React from "react";
 import {
   Card,
@@ -23,6 +24,7 @@ interface LanguageDistributionProps {
 }
 
 export function LanguageDistribution({ data }: LanguageDistributionProps) {
+  console.log("Render languageDistribution with fetched data: ", data);
   const languages = data?.language_ratio || {};
 
   const chartData = React.useMemo(

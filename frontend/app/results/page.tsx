@@ -2,14 +2,14 @@ import React, { Suspense } from 'react';
 import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
 // import LanguageDistribution from "@/app/components/step-1-language-distribution";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
-// import ResourceRequirements from "@/app/components/step-2-resource-requirements";
+import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
 // import InstanceRecommendationsWithData from "@/app/components/step-3-instance-recommendations";
 // import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winner";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { LoadingComponent } from "@/app/components/ui/loading";
 import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch_steps";
-import { GitBody, EnvBody, AnalyzeInstanceBody, InstanceResult, CloudInstance } from "@/app/types/model";
+import { GitBody, EnvBody, AnalyzeInstanceBody, InstanceResult, CloudInstance , FinalResponse} from "@/app/types/model";
 
 type SearchParams = {
   repoUrl?: string;
@@ -18,7 +18,7 @@ type SearchParams = {
 };
 
 async function LatestResults({ analysisData }: { analysisData: any }) {
-  console.log("Fetched analysis data for LatestResults:", analysisData);
+  console.log("get data from before steps:", analysisData);
   const resourceRequirements = await fetchResourceRequirements({
     aws: analysisData.aws as CloudInstance,
     gcp: analysisData.gcp as CloudInstance,
@@ -80,12 +80,22 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
   const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
 
   console.log("Fetching cache data for:", gitBody);
-  const cacheData = await fetchCache(gitBody);
-  console.log("Fetched cache data:", cacheData);
+  let analysisData;
+  try { 
+    const cacheData = await fetchCache(gitBody);
+    console.log("Fetched cache data:", cacheData);
 
-  console.log("Fetching analysis data for:", gitBody);
-  const analysisData = await fetchAnalysisData(gitBody);
-  console.log("Fetched analysis data:", analysisData);
+    if (cacheData && !cacheData.errors && cacheData.message !== "Cache not found") {
+      console.log("Using cached data:", cacheData);
+      analysisData = cacheData;
+    } else {
+      throw new Error("Cache not found or has errors");
+     }
+    } catch (error) {
+      console.log("Fetching analysis data for:", gitBody);
+      analysisData = await fetchAnalysisData(gitBody);
+      console.log("Fetched analysis data:", analysisData);
+    }
 
   return (
     <div className="mx-auto max-w-7xl p-6 bg-background border">
@@ -115,7 +125,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
                 Resource Requirements
               </CardTitle>
             </CardHeader>
-            {/* <ResourceRequirements data={analysisData} /> */}
+            <ResourceRequirements data={analysisData} />
           </Card>
         </div>
         <Suspense fallback={<LoadingComponent />}>
