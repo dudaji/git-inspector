@@ -4,6 +4,9 @@
 
 import json
 from firebase_functions import https_fn
+import firebase_admin
+from pathlib import Path
+from firebase_admin import initialize_app, credentials
 
 from functions.cloud import (
     environment_analyzer,
@@ -12,6 +15,14 @@ from functions.cloud import (
     repo_analyzer,
     analyze,
 )
+
+initialize_app()
+
+if not firebase_admin._apps:
+    cred = credentials.Certificate(
+        f"{Path(__file__).resolve().parent}/../firebase-svc-account-key.json"
+    )
+    initialize_app(cred)
 
 
 @https_fn.on_request(timeout_sec=300)
@@ -35,7 +46,7 @@ def analyzer(req: https_fn.Request) -> https_fn.Response:
     # return https_fn.Response("Hello world!")
 
 
-@https_fn.on_request()
+@https_fn.on_request(timeout_sec=300)
 def analyze_step_by_step(req: https_fn.Request) -> https_fn.Response:
     if req.method == "OPTIONS":
         # Allows GET requests from any origin with the Content-Type
