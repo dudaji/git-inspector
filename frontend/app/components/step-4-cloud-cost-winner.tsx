@@ -1,7 +1,7 @@
 "use client"; // 클라이언트 컴포넌트로 지정
 
 import React, { useState } from "react";
-import { calculateScores } from "@/app/lib/score";
+import { calculateScores, Score } from "@/app/lib/score";
 import CloudScoreCard from "./cloud-cost-card";
 import { Modal } from "@/app/components/ui/modal";
 import { CloudInstance, InstanceResult , RepoResult} from "@/app/types/model";
@@ -68,11 +68,31 @@ const CloudCostInstances = ({
   recommendationData: InstanceResult;
   analysisData: RepoResult;
 }) => {
+  const [showScoreList, setShowScoreList] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
   if (!recommendationData || Object.keys(recommendationData).length === 0) {
     return <p>No results available.</p>;
   }
+
+  function getMaxTotalScore(scores: Record<string, Score>): string {
+    let maxTotalScore: Score | null = null;
+    let maxKey: string = "";
+  
+    for (const key in scores) {
+      if (scores.hasOwnProperty(key)) {
+        const score = scores[key];
+        if (maxTotalScore === null || score.total > maxTotalScore.total) {
+          maxTotalScore = score;
+          maxKey = key;
+        }
+      }
+    }
+  
+    return maxKey
+  }
+  
+      
 
   const transformedAnalysisData: Record<string, InstanceResult> = {
     gcp: {
@@ -102,19 +122,28 @@ const CloudCostInstances = ({
   };
 
   const [winner, scores] = calculateScores(transformedAnalysisData);
-
+  const bestProviderName = getMaxTotalScore(scores)
   return (
     <div>
-      {Object.entries(scores)
-        .sort((a, b) => b[1].total - a[1].total)
-        .map(([providerName, score]) => (
-          <CloudScoreCard
-            key={providerName}
+      <CloudScoreCard
+        key={bestProviderName}
+        provider={bestProviderName}
+        winner={bestProviderName === winner}
+        score={scores[bestProviderName]}
+      />
+      <button onClick={() => {setShowScoreList(true)}} className="mt-4 text-blue-500 underline">
+        Show All Scores
+      </button>
+      <Modal isVisible={showScoreList} onClose={() => setShowScoreList(false)}>
+        {Object.entries(scores).map(([providerName, score]) => {
+          return (<CloudScoreCard 
+            key={`${providerName}-modal`}
             provider={providerName}
-            winner={providerName === winner}
+            winner={bestProviderName === winner}
             score={score}
-          />
-        ))}
+          />)
+        })}
+      </Modal>
       <ConclusionInstance
         provider={winner}
         instance={transformedAnalysisData[winner].instance}
