@@ -146,11 +146,6 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
           <LatestResults analysisData={analysisData} />
         </Suspense>
       </div>
-       <div className="w-full flex justify-center">
-        <Link href={detailedPagePath}>
-          <Button className="mt-6 w-full">Get All LLM Analysis</Button>
-        </Link>
-        </div>
     </div>
   );
 }
