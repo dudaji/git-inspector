@@ -39,8 +39,8 @@ const InstanceRecommendCard: React.FC<InstanceRecommendCardProps> = ({
       <div className="space-y-4">
         {instanceDetails.map((detail) => (
           <div key={detail.name} className="flex justify-between items-center mb-1">
-            <span className="text-sm font-medium text-gray-700">{detail.name}</span>
-            <span className="text-sm font-medium text-gray-700">{detail.value}</span>
+            <span className="text-lg font-medium text-gray-700">{detail.name}</span>
+            <span className="text-lg font-medium text-gray-700">{detail.value}</span>
           </div>
         ))}
       </div>

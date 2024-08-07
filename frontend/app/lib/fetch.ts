@@ -1,15 +1,16 @@
+import { GitBody, EnvBody, AnalyzeInstanceBody } from "@/app/types/model";
+const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
 
-// Default Fetch.
-export async function fetchAnalysisData(
-  repoUrl?: string,
-  branchName?: string,
-  directory?: string,
-) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
+// Default Fetch - Analyze repository data
+// - Step 1 API
+// - Repository 분석 결과 반환
+// - Cloud provider 별 minimum instance spec과 Language Ratio
+export async function fetchAnalysisData({ repoUrl, branchName, directory }: GitBody) {
   if (repoUrl && branchName) {
     try {
+      console.log("Fecthing to... ", `${analysisEndpoint}/analyze-repo`);
       const body = { repoUrl, branchName, ...(directory && { directory }) };
-      const response = await fetch(`${analysisEndpoint}/cache`, {
+      const response = await fetch(`${analysisEndpoint}/analyze-repo`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,20 +41,27 @@ export async function fetchAnalysisData(
   };
 }
 
-// Step-1 Fetch - language distributions
-export async function fetchLanguageDistribution(repoUrl: string) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
+// Cache
+// - Github 정보를 토대로 이전에 했던 기록이 있으면 기록 결과를 반환하고, 없으면 404에러
+export async function fetchCache({ repoUrl, branchName, directory }: GitBody) {
   try {
-    const response = await fetch(`${analysisEndpoint}/language-distribution`, {
+    console.log("Fecthing to... ", analysisEndpoint);
+    const body = { repoUrl, branchName, ...(directory && { directory }) };
+    const response = await fetch(`${analysisEndpoint}/cache`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ repoUrl }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch language distribution");
+      if (response.status === 404) {
+        return {
+          message: "Cache not found",
+        };
+      }
+      throw new Error("Failed to fetch cache");
     }
 
     return await response.json();
@@ -70,16 +78,17 @@ export async function fetchLanguageDistribution(repoUrl: string) {
     }
   }
 }
-// Step-2 Fetch - get ResourceRequiremetns
-export async function fetchResourceRequirements(repoUrl: string) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
+
+// Step 2 API
+// - Minimum instance spec을 보고 전력 소비량과 탄소 배출량 추정
+export async function fetchResourceRequirements(envBody: EnvBody) {
   try {
-    const response = await fetch(`${analysisEndpoint}/resource-requirements`, {
+    const response = await fetch(`${analysisEndpoint}/analyze-env`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ repoUrl }),
+      body: JSON.stringify(envBody),
     });
 
     if (!response.ok) {
@@ -101,87 +110,25 @@ export async function fetchResourceRequirements(repoUrl: string) {
   }
 }
 
-// Step-3 Fetch - get costs
-export async function fetchRecommendations(
-  repoUrl: string,
-  cpu: number,
-  memory: number,
-) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
+// Step 3 API
+// - Minimum Instance spec, 전력 소비량, 탄소 배출량 정보를 토대로 가장 좋은 Instance 선택
+export async function fetchRecommendations(analyzeInstanceBody: AnalyzeInstanceBody) {
   try {
-    const response = await fetch(`${analysisEndpoint}/recommendations`, {
+    const response = await fetch(`${analysisEndpoint}/analyze-instance`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ repoUrl, cpu, memory }),
+      body: JSON.stringify(analyzeInstanceBody),
     });
 
     if (!response.ok) {
       throw new Error("Failed to fetch recommendations");
     }
+    const data = await response.json();
+    console.log("Fetched recommendations:", data);
 
-    return await response.json();
-  } catch (err) {
-    if (err instanceof Error) {
-      return {
-        errors: err,
-        message: err.message,
-      };
-    } else {
-      return {
-        message: "An unknown error occurred",
-      };
-    }
-  }
-}
-// Step-3 Fetch - get costs
-export async function fetchCosts(repoUrl: string) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
-  try {
-    const response = await fetch(`${analysisEndpoint}/costs`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ repoUrl }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch costs");
-    }
-
-    return await response.json();
-  } catch (err) {
-    if (err instanceof Error) {
-      return {
-        errors: err,
-        message: err.message,
-      };
-    } else {
-      return {
-        message: "An unknown error occurred",
-      };
-    }
-  }
-}
-
-export async function fetchSummary(repoUrl: string) {
-  const analysisEndpoint = process.env.ANALYSIS_ENDPOINT;
-  try {
-    const response = await fetch(`${analysisEndpoint}/summary`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ repoUrl }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch summary");
-    }
-
-    return await response.json();
+    return data;
   } catch (err) {
     if (err instanceof Error) {
       return {

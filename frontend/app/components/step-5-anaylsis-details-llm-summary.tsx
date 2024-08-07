@@ -1,16 +1,8 @@
-import { fetchAnalysisData } from "@/app/lib/fetch";
-
-export default async function AnalysisResultsDetail({
-  repoUrl,
-  branchName,
-  directory,
+export default function AnalysisResultsDetail({
+  result,
 }: {
-  repoUrl?: string;
-  branchName?: string;
-  directory?: string;
+  result: any;
 }) {
-  const result = await fetchAnalysisData(repoUrl, branchName, directory);
-
   if (result?.message) {
     return (
       <div className="mt-4 rounded-md bg-red-500/10 p-4 text-red-500">
@@ -23,7 +15,6 @@ export default async function AnalysisResultsDetail({
     return <p>No results available.</p>;
   }
 
-  // TODO: Order by Scores.
   const cloudProviders = ["gcp", "aws", "azure"];
   const renderProviderData = (provider: string) => (
     <div key={provider} className="mb-8">
@@ -69,19 +60,19 @@ export default async function AnalysisResultsDetail({
           <tr>
             <td className="border px-4 py-2">Hourly Pricing</td>
             <td className="border px-4 py-2">
-              ${result[provider].instance.cost_per_hour.toPrecision(3)}
+              ${result[provider].instance.costPerHour.toPrecision(3)}
             </td>
           </tr>
           <tr>
             <td className="border px-4 py-2">Power Consumption (kWh)</td>
             <td className="border px-4 py-2">
-              {result[provider].estimate.power_consumption}
+              {result[provider].estimate.powerConsumption}
             </td>
           </tr>
           <tr>
             <td className="border px-4 py-2">Carbon Footprint (kg CO2)</td>
             <td className="border px-4 py-2">
-              {result[provider].estimate.carbon_footprint}
+              {result[provider].estimate.carbonFootprint}
             </td>
           </tr>
         </tbody>

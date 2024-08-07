@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { Card, CardHeader, CardTitle } from "@/app/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
 // import LanguageDistribution from "@/app/components/step-1-language-distribution";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
@@ -8,8 +8,8 @@ import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winne
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { LoadingComponent } from "@/app/components/ui/loading";
-import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch_steps";
-import { GitBody, EnvBody, AnalyzeInstanceBody, InstanceResult, CloudInstance , FinalResponse} from "@/app/types/model";
+import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch";
+import { GitBody, Estimate, AnalyzeInstanceBody, InstanceResult, CloudInstance , FinalResponse} from "@/app/types/model";
 
 type SearchParams = {
   repoUrl?: string;
@@ -28,39 +28,51 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
   const instanceRecommendation = await fetchRecommendations({
     aws: {
       instance: analysisData.aws as CloudInstance,
-      estimate: resourceRequirements.aws as InstanceResult["estimate"],
+      estimate: resourceRequirements.aws as Estimate,
     },
     gcp: {
       instance: analysisData.gcp as CloudInstance,
-      estimate: resourceRequirements.gcp as InstanceResult["estimate"],
+      estimate: resourceRequirements.gcp as Estimate,
     },
     azure: {
       instance: analysisData.azure as CloudInstance,
-      estimate: resourceRequirements.azure as InstanceResult["estimate"],
+      estimate: resourceRequirements.azure as Estimate,
     },
   });
-  // console.log("Fetched instance recommendations:", instanceRecommendation);
+
+  const completeData = {
+    ...resourceRequirements,
+    recommendation: instanceRecommendation
+  };
+
 
   return (
     <>
       <div className="w-full md:w-1/2 px-2 mt-5">
-        <Card className="mb-4">
+        <Card className="mb-4 h-full flex flex-col">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-center">
               Cloud Instance Recommendation
             </CardTitle>
           </CardHeader>
-          <InstanceRecommendationsWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
+          <CardContent className="flex-grow">
+            <InstanceRecommendationsWithData 
+              recommendationData={instanceRecommendation} 
+              analysisData={analysisData} 
+            />
+          </CardContent>
         </Card>
       </div>
       <div className="w-full md:w-1/2 px-2 mt-5">
-        <Card className="mb-4">
+        <Card className="mb-4 h-full flex flex-col">
           <CardHeader>
             <CardTitle className="text-xl font-bold text-center">
               Instance Scores
             </CardTitle>
           </CardHeader>
-          <CloudCostInstancesWithData recommendationData={instanceRecommendation} analysisData={analysisData} />
+            <CardContent className="flex-grow">
+            <CloudCostInstancesWithData recommendationData={completeData} analysisData={analysisData} />
+            </CardContent>
         </Card>
       </div>
     </>
@@ -79,11 +91,9 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
   const branchName = searchParams?.branchName || "N/A";
   const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
 
-  console.log("Fetching cache data for:", gitBody);
   let analysisData;
   try { 
     const cacheData = await fetchCache(gitBody);
-    console.log("Fetched cache data:", cacheData);
 
     if (cacheData && !cacheData.errors && cacheData.message !== "Cache not found") {
       console.log("Using cached data:", cacheData);
@@ -92,7 +102,7 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
       throw new Error("Cache not found or has errors");
      }
     } catch (error) {
-      console.log("Fetching analysis data for:", gitBody);
+      console.log("Fetching analysis data with:", gitBody);
       analysisData = await fetchAnalysisData(gitBody);
       console.log("Fetched analysis data:", analysisData);
     }
@@ -109,32 +119,38 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
       </CardHeader>
       <div className="flex flex-wrap -mx-2">
         <div className="w-full md:w-1/2 px-2">
-          <Card className="h-full">
+          <Card className="mb-4 h-full flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-center">
                 Language Distribution
               </CardTitle>
             </CardHeader>
-            <LanguageDistribution data={analysisData} />
+            <CardContent className="flex-grow"> 
+             <LanguageDistribution data={analysisData} />
+            </CardContent>
           </Card>
         </div>
         <div className="w-full md:w-1/2 px-2">
-          <Card className="h-full">
+          <Card className="mb-4 h-full flex flex-col">
             <CardHeader>
               <CardTitle className="text-xl font-bold text-center">
                 Resource Requirements
               </CardTitle>
             </CardHeader>
-            <ResourceRequirements data={analysisData} />
+              <CardContent className="flex-grow">
+              <ResourceRequirements data={analysisData} />
+              </CardContent>
           </Card>
         </div>
         <Suspense fallback={<LoadingComponent />}>
           <LatestResults analysisData={analysisData} />
         </Suspense>
       </div>
-      <Link href={detailedPagePath}>
-        <Button className="mt-6 w-full">Get All LLM Analysis</Button>
-      </Link>
+       <div className="w-full flex justify-center">
+        <Link href={detailedPagePath}>
+          <Button className="mt-6 w-full">Get All LLM Analysis</Button>
+        </Link>
+        </div>
     </div>
   );
 }
