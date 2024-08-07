@@ -49,30 +49,33 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
   return (
     <>
       <div className="w-full md:w-1/2 px-2 mt-5">
-        <Card className="mb-4 h-full flex flex-col">
+        <Card className="mb-2 h-full flex flex-col">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-center">
+            <CardTitle className="text-lg font-bold text-center">
               Cloud Instance Recommendation
             </CardTitle>
           </CardHeader>
           <CardContent className="flex-grow">
-            <InstanceRecommendationsWithData 
-              recommendationData={instanceRecommendation} 
-              analysisData={analysisData} 
+            <InstanceRecommendationsWithData
+              recommendationData={instanceRecommendation}
+              analysisData={analysisData}
             />
           </CardContent>
         </Card>
       </div>
       <div className="w-full md:w-1/2 px-2 mt-5">
-        <Card className="mb-4 h-full flex flex-col">
+        <Card className="mb-2 h-full flex flex-col">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-center">
+            <CardTitle className="text-lg font-bold text-center">
               Instance Scores
             </CardTitle>
           </CardHeader>
-            <CardContent className="flex-grow">
-            <CloudCostInstancesWithData recommendationData={completeData} analysisData={analysisData} />
-            </CardContent>
+          <CardContent className="flex-grow">
+            <CloudCostInstancesWithData
+              recommendationData={completeData}
+              analysisData={analysisData}
+            />
+          </CardContent>
         </Card>
       </div>
     </>
@@ -107,45 +110,45 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
       console.log("Fetched analysis data:", analysisData);
     }
 
-  return (
-    <div className="mx-auto max-w-7xl p-6 bg-background border">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold">
-          Analysis Results of branch
-          <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
-          in
-          <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
-        </CardTitle>
-      </CardHeader>
-      <div className="flex flex-wrap -mx-2">
-        <div className="w-full md:w-1/2 px-2">
-          <Card className="mb-4 h-full flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-center">
-                Language Distribution
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex-grow"> 
-             <LanguageDistribution data={analysisData} />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="w-full md:w-1/2 px-2">
-          <Card className="mb-4 h-full flex flex-col">
-            <CardHeader>
-              <CardTitle className="text-xl font-bold text-center">
-                Resource Requirements
-              </CardTitle>
-            </CardHeader>
+    return (
+      <div className="mx-auto max-w-6xl p-4 bg-background border">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold">
+            Analysis Results of branch
+            <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
+            in
+            <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
+          </CardTitle>
+        </CardHeader>
+        <div className="flex flex-wrap -mx-2">
+          <div className="w-full md:w-1/2 px-2">
+            <Card className="mb-2 h-full flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-center">
+                  Language Distribution
+                </CardTitle>
+              </CardHeader>
               <CardContent className="flex-grow">
-              <ResourceRequirements data={analysisData} />
+                <LanguageDistribution data={analysisData} />
               </CardContent>
-          </Card>
+            </Card>
+          </div>
+          <div className="w-full md:w-1/2 px-2">
+            <Card className="mb-2 h-full flex flex-col">
+              <CardHeader>
+                <CardTitle className="text-lg font-bold text-center">
+                  Resource Requirements
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <ResourceRequirements data={analysisData} />
+              </CardContent>
+            </Card>
+          </div>
+          <Suspense fallback={<LoadingComponent />}>
+            <LatestResults analysisData={analysisData} />
+          </Suspense>
         </div>
-        <Suspense fallback={<LoadingComponent />}>
-          <LatestResults analysisData={analysisData} />
-        </Suspense>
       </div>
-    </div>
-  );
-}
+    );
+  }

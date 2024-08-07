@@ -72,18 +72,18 @@ export function GitRepoAnalyzer() {
   };
 
   return (
-    <div className="relative mx-auto max-w-md p-[1.5px] rounded-full overflow-hidden">
-     <div className="animate-rotate absolute inset-0 h-full w-full rounded-full bg-[conic-gradient(#FFFFFF_30deg,transparent_1200deg)]"></div>
-      <Card className="relative p-6 bg-background rounded-full">
+    <div className="relative mx-auto max-w-sm p-[1.5px] rounded-lg overflow-hidden">
+      <div className="animate-rotate absolute inset-0 h-full w-full rounded-lg bg-[conic-gradient(#FFFFFF_30deg,transparent_1200deg)]"></div>
+      <Card className="relative p-6 bg-background rounded-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Git Watt</CardTitle>
+          <CardTitle className="text-xl font-bold">Git Watt</CardTitle>
           <CardDescription className="text-muted-foreground">
             Enter a Git Repo URL, Branch name to inspect
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={handleSubmit}>
-            <div className="space-y-2 mt-4">
+            <div className="space-y-1 mt-4">
               <Label htmlFor="repo-url">
                 Repository URL <span>*</span>
               </Label>
@@ -93,9 +93,9 @@ export function GitRepoAnalyzer() {
                 required
                 value={repoUrl}
                 onChange={(e) => setRepoUrl(e.target.value)}
-                />
+              />
             </div>
-            <div className="space-y-2 mt-4">
+            <div className="space-y-1 mt-4">
               <Label htmlFor="branch-name">
                 Branch Name <span>*</span>
               </Label>
@@ -105,27 +105,26 @@ export function GitRepoAnalyzer() {
                 required
                 value={branchName}
                 onChange={(e) => setBranchName(e.target.value)}
-                />
+              />
             </div>
-            <div className="space-y-2 mt-4">
-                <Label htmlFor="directory">
-                  Directory <span>(Optional)</span>
-                </Label>
+            <div className="space-y-1 mt-4">
+              <Label htmlFor="directory">
+                Directory <span>(Optional)</span>
+              </Label>
               <Input
                 id="directory"
                 placeholder="Optional"
                 value={directory}
                 onChange={(e) => setDirectory(e.target.value)}
-                />
+              />
             </div>
             {loading ? (
               <div className="flex flex-col items-center justify-center py-8 space-y-4">
-                <LoadingComponent/>
+                <LoadingComponent />
               </div>
             ) : (
-              <div className="relative mt-6 w-full animate-pulse-border">
-                <div className="absolute inset-0 animate-pulse-border rounded-lg"></div>
-                <Button type="submit" className="relative w-full">
+              <div className="relative mt-6 w-full">
+                <Button type="submit" className="relative w-full text-sm">
                   Analyze Repository
                 </Button>
               </div>
