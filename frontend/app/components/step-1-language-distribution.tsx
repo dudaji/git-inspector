@@ -25,8 +25,7 @@ interface LanguageDistributionProps {
 
 export function LanguageDistribution({ data }: LanguageDistributionProps) {
   // console.log("Render languageDistribution with fetched data: ", data);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const languages = data?.languageRatio || {}; 
+  const languages = React.useMemo(() => data?.languageRatio || {}, [data]);
   
   const chartData = React.useMemo(
     () =>
