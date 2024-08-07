@@ -14,7 +14,6 @@ import {
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
 import { Label, PieChart, Pie } from "recharts";
-// import { Colors, getHexColour } from "github-linguist-colours"; //Suddenly archived
 import colors from "github-colors";
 
 interface LanguageDistributionProps {
