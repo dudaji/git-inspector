@@ -1,4 +1,3 @@
-
 "use client";
 // NOTE : Need to Render in Client Sides
 import React from "react";
@@ -15,7 +14,8 @@ import {
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
 import { Label, PieChart, Pie } from "recharts";
-import { Colors, getHexColour } from "github-linguist-colours";
+// import { Colors, getHexColour } from "github-linguist-colours"; //Suddenly archived
+import colors from "github-colors";
 
 interface LanguageDistributionProps {
   data: {
@@ -25,14 +25,14 @@ interface LanguageDistributionProps {
 
 export function LanguageDistribution({ data }: LanguageDistributionProps) {
   // console.log("Render languageDistribution with fetched data: ", data);
-  const languages = data?.languageRatio || {};
-
+  const languages = React.useMemo(() => data?.languageRatio || {}, [data]);
+  
   const chartData = React.useMemo(
     () =>
       Object.entries(languages).map(([language, bytes]) => ({
         language,
         bytes,
-        fill: getHexColour(language as Colors),
+        fill: colors.get(language)?.color || "#808080", // 기본 색상 사용
       })),
     [languages],
   );

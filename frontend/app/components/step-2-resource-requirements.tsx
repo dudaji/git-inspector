@@ -29,7 +29,7 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
 
   const { minCpu, minMemory } = getMinimumValues();
   return (
-    <Card className="flex flex-col bg-secondary-background h-full">
+    <Card className="flex flex-col bg-secondary-background h-full bg-border-winner-border">
       <CardHeader className="items-center pb-0">
         <CardTitle>Minimum Resources to Run</CardTitle>
       </CardHeader>
