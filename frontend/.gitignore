@@ -5,7 +5,10 @@ node_modules
 /build
 /.firebase
 *.log
-*.json
+# *.json
 !package-lock.json
 !package.json
 !tsconfig.json
+!firebase.json
+!components.json
+!firebase.indexes.json
