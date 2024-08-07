@@ -14,7 +14,8 @@ import {
   ChartTooltipContent,
 } from "@/app/components/ui/chart";
 import { Label, PieChart, Pie } from "recharts";
-import colors from "github-colors";
+import githubColors from 'github-colors';
+
 
 interface LanguageDistributionProps {
   data: {
@@ -28,13 +29,18 @@ export function LanguageDistribution({ data }: LanguageDistributionProps) {
   
   const chartData = React.useMemo(
     () =>
-      Object.entries(languages).map(([language, bytes]) => ({
-        language,
-        bytes,
-        fill: colors.get(language)?.color || "#808080", // 기본 색상 사용
-      })),
-    [languages],
+      Object.entries(languages).map(([language, bytes]) => {
+        const colorData = githubColors.get(language);
+        console.log("colordata? ", colorData)
+        return {
+          language,
+          value: bytes,
+          fill: colorData?.color || "#808080", // 기본 색상 사용
+        };
+      }),
+    [languages]
   );
+
 
   const chartConfig = {
     languages: {
@@ -43,7 +49,7 @@ export function LanguageDistribution({ data }: LanguageDistributionProps) {
   };
 
   const totalLanguageBytes = React.useMemo(() => {
-    return chartData.reduce((acc, curr) => acc + (curr.bytes as number), 0);
+    return chartData.reduce((acc, curr) => acc + (curr.value as number), 0);
   }, [chartData]);
 
   return (
@@ -64,7 +70,7 @@ export function LanguageDistribution({ data }: LanguageDistributionProps) {
             />
             <Pie
               data={chartData}
-              dataKey="bytes"
+              dataKey="value" // 변경된 부분
               nameKey="language"
               innerRadius={60}
               strokeWidth={5}
