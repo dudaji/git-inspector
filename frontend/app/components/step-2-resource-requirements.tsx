@@ -13,7 +13,7 @@ interface ResourceRequirementsProps {
 
 export function ResourceRequirements({ data }: ResourceRequirementsProps) {
   const getMinimumValues = () => {
-    if (!data) return { minCpu: null, minMemory: null };
+    if (!data) return { minCpu: 1, minMemory: 1 };
 
     const instances: CloudInstance[] = [
       data.gcp,
@@ -21,8 +21,9 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
       data.azure,
     ];
 
-    const minCpu = Math.min(...instances.map(instance => instance.cpu));
-    const minMemory = Math.min(...instances.map(instance => instance.ram));
+    const minCpu = Math.max(1, Math.min(...instances.map(instance => instance.cpu)));
+    const minMemory = Math.max(1, Math.min(...instances.map(instance => instance.ram)));
+
     console.log("resource requirements parsing :", minCpu, minMemory);
     return { minCpu, minMemory };
   };
@@ -36,13 +37,13 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
       <CardContent className="flex flex-col items-center justify-center h-full">
         <div className="flex items-center">
           <div className="text-4xl font-bold text-primary">
-            {minCpu !== null ? minCpu : "N/A"}
+            {minCpu}
           </div>
           <div className="text-4xl font-medium text-muted-foreground">CPU</div>
         </div>
         <div className="flex items-center space-x-2">
           <div className="text-4xl font-bold text-primary">
-            {minMemory !== null ? minMemory : "N/A"}
+            {minMemory}
           </div>
           <div className="text-4xl font-medium text-muted-foreground">
             Gi Memory
