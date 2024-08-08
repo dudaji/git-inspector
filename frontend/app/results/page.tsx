@@ -1,5 +1,10 @@
-import React, { Suspense } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/app/components/ui/card";
+import React, { Suspense } from "react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/app/components/ui/card";
 // import LanguageDistribution from "@/app/components/step-1-language-distribution";
 import { LanguageDistribution } from "@/app/components/step-1-language-distribution";
 import { ResourceRequirements } from "@/app/components/step-2-resource-requirements";
@@ -8,8 +13,20 @@ import CloudCostInstancesWithData from "@/app/components/step-4-cloud-cost-winne
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
 import { LoadingComponent } from "@/app/components/ui/loading";
-import { fetchAnalysisData, fetchCache, fetchResourceRequirements, fetchRecommendations } from "@/app/lib/fetch";
-import { GitBody, Estimate, AnalyzeInstanceBody, InstanceResult, CloudInstance , FinalResponse} from "@/app/types/model";
+import {
+  fetchAnalysisData,
+  fetchCache,
+  fetchResourceRequirements,
+  fetchRecommendations,
+} from "@/app/lib/fetch";
+import {
+  GitBody,
+  Estimate,
+  AnalyzeInstanceBody,
+  InstanceResult,
+  CloudInstance,
+  FinalResponse,
+} from "@/app/types/model";
 
 type SearchParams = {
   repoUrl?: string;
@@ -23,28 +40,30 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
     aws: analysisData.aws as CloudInstance,
     gcp: analysisData.gcp as CloudInstance,
     azure: analysisData.azure as CloudInstance,
+    hash_id: analysisData.hash_id,
   });
+
+  const { hash_id, ...filtered } = analysisData;
 
   const instanceRecommendation = await fetchRecommendations({
     aws: {
-      instance: analysisData.aws as CloudInstance,
+      instance: filtered.aws as CloudInstance,
       estimate: resourceRequirements.aws as Estimate,
     },
     gcp: {
-      instance: analysisData.gcp as CloudInstance,
+      instance: filtered.gcp as CloudInstance,
       estimate: resourceRequirements.gcp as Estimate,
     },
     azure: {
-      instance: analysisData.azure as CloudInstance,
+      instance: filtered.azure as CloudInstance,
       estimate: resourceRequirements.azure as Estimate,
     },
   });
 
   const completeData = {
     ...resourceRequirements,
-    recommendation: instanceRecommendation
+    recommendation: instanceRecommendation,
   };
-
 
   return (
     <>
@@ -58,7 +77,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
           <CardContent className="flex-grow">
             <InstanceRecommendationsWithData
               recommendationData={instanceRecommendation}
-              analysisData={analysisData}
+              analysisData={filtered}
             />
           </CardContent>
         </Card>
@@ -73,7 +92,7 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
           <CardContent className="flex-grow">
             <CloudCostInstancesWithData
               recommendationData={completeData}
-              analysisData={analysisData}
+              analysisData={filtered}
             />
           </CardContent>
         </Card>
@@ -82,7 +101,11 @@ async function LatestResults({ analysisData }: { analysisData: any }) {
   );
 }
 
-export default async function ResultsPage({ searchParams }: { searchParams: SearchParams }) {
+export default async function ResultsPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
   const encodedRepoUrl = encodeURIComponent(searchParams?.repoUrl || "");
   const encodedBranchName = encodeURIComponent(searchParams?.branchName || "");
   const encodedDirectory = encodeURIComponent(searchParams?.directory || "");
@@ -92,63 +115,55 @@ export default async function ResultsPage({ searchParams }: { searchParams: Sear
 
   const repoUrl = searchParams?.repoUrl || "N/A";
   const branchName = searchParams?.branchName || "N/A";
-  const gitBody: GitBody = { repoUrl, branchName, directory: searchParams?.directory || "" };
+  const gitBody: GitBody = {
+    repoUrl,
+    branchName,
+    directory: searchParams?.directory || "",
+  };
 
-  let analysisData;
-  try { 
-    const cacheData = await fetchCache(gitBody);
+  const analysisData = await fetchAnalysisData(gitBody);
+  const hashKey = analysisData?.hash_id;
 
-    if (cacheData && !cacheData.errors && cacheData.message !== "Cache not found") {
-      console.log("Using cached data:", cacheData);
-      analysisData = cacheData;
-    } else {
-      throw new Error("Cache not found or has errors");
-     }
-    } catch (error) {
-      console.log("Fetching analysis data with:", gitBody);
-      analysisData = await fetchAnalysisData(gitBody);
-      console.log("Fetched analysis data:", analysisData);
-    }
-
-    return (
-      <div className="mx-auto max-w-6xl p-4 bg-background border">
-        <CardHeader>
-          <CardTitle className="text-xl font-bold">
-            Analysis Results of branch
-            <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
-            in
-            <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
-          </CardTitle>
-        </CardHeader>
-        <div className="flex flex-wrap -mx-2">
-          <div className="w-full md:w-1/2 px-2">
-            <Card className="mb-2 h-full flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-center">
-                  Language Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <LanguageDistribution data={analysisData} />
-              </CardContent>
-            </Card>
-          </div>
-          <div className="w-full md:w-1/2 px-2">
-            <Card className="mb-2 h-full flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-lg font-bold text-center">
-                  Resource Requirements
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <ResourceRequirements data={analysisData} />
-              </CardContent>
-            </Card>
-          </div>
-          <Suspense fallback={<LoadingComponent />}>
-            <LatestResults analysisData={analysisData} />
-          </Suspense>
+  return (
+    <div className="mx-auto max-w-6xl p-4 bg-background border">
+      <CardHeader>
+        <CardTitle className="text-xl font-bold">
+          Analysis Results of branch
+          <span style={{ color: "hsl(var(--accent))" }}> {branchName} </span>
+          in
+          <span style={{ color: "hsl(var(--accent))" }}> {repoUrl}</span>
+        </CardTitle>
+      </CardHeader>
+      <div className="flex flex-wrap -mx-2">
+        <div className="w-full md:w-1/2 px-2">
+          <Card className="mb-2 h-full flex flex-col">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-center">
+                Language Distribution
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <LanguageDistribution data={analysisData} />
+            </CardContent>
+          </Card>
         </div>
+        <div className="w-full md:w-1/2 px-2">
+          <Card className="mb-2 h-full flex flex-col">
+            <CardHeader>
+              <CardTitle className="text-lg font-bold text-center">
+                Resource Requirements
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow">
+              <ResourceRequirements data={analysisData} />
+            </CardContent>
+          </Card>
+        </div>
+        <Suspense fallback={<LoadingComponent />}>
+          <LatestResults analysisData={analysisData} />
+        </Suspense>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
