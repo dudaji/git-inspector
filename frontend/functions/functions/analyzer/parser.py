@@ -9,11 +9,12 @@ class Instance(BaseModel):
         description="Name of cloud provider (GCP or AWS or Azure)",
     )
     name: str = Field(description="Name of instance type")
-    cpu: int = Field(description="The number of instance cpu cores")
+    cpu: float = Field(description="The number of instance cpu cores")
     ram: float = Field(description="The capacity of instance ram (GiB)")
     storage: int = Field(description="The capacity of instance storage (GiB)")
     gpu: Optional[str] = Field(
-        default=None, description="Name of gpu model and memory (GiB) of instance"
+        default="None",
+        description="Name of gpu model and memory (GiB) of instance. If no gpu needed, then set 'None' with string type",
     )
     region: str = Field(description="Region of instance")
     cost_per_hour: float = Field(
