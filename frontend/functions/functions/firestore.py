@@ -1,6 +1,8 @@
 import json
 from typing import Optional, Union
 
+from pydantic import BaseModel
+
 import firebase_admin
 from firebase_admin import firestore
 
@@ -19,12 +21,13 @@ def check_cache(gemini_analysis_key: str) -> Optional[dict]:
     doc = analysis_ref.get()
 
     if doc.exists:
-        return doc.to_dict().get("result")
+        res = doc.to_dict()
+        return res.get("result") if res else None
 
     return None
 
 
-def save_to_firestore(
+def save_gemini_analysis(
     key: str,
     repo_url: str,
     branch: str,
@@ -55,3 +58,19 @@ def save_to_firestore(
     )
     print("Save Analysis")
     doc_ref.set(json.loads(analysis.model_dump_json()))
+
+
+def save_to_firestore(collection: str, key: str, data: Union[dict, BaseModel]) -> None:
+    db = None
+    if firebase_admin._apps:
+        db = firestore.client()
+    else:
+        raise SystemError("Firebase app is not initialized")
+
+    data_dict = data if isinstance(data, dict) else {}
+    if isinstance(data, BaseModel):
+        data_dict = json.loads(data.model_dump_json())
+
+    doc_ref = db.collection(collection).document(key)
+    if data_dict:
+        doc_ref.set(data_dict)
