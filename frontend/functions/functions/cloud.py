@@ -6,12 +6,10 @@ from typing import Optional, Dict, Tuple
 from firebase_functions import https_fn
 from functions.analyzer.calculator import (
     estimate_environment,
-    estimate_environment_mock,
 )
 from functions.analyzer.full_analyzer import (
     FinalResponse,
     analyze_full_steps,
-    analyze_with_mock,
 )
 
 from dotenv import load_dotenv
@@ -23,12 +21,10 @@ from functions.analyzer.parser import Instance, InstanceResult, RepoResult
 from functions.firestore import check_cache, save_to_firestore
 from functions.git import get_latest_commit_sha
 
-from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
-
-from functions.analyzer.repo_analyzer import analyze_repo, analyze_repo_mock
+from functions.analyzer.repo_analyzer import analyze_repo
 
 load_dotenv()
-os.environ["LANGCHAIN_PROJECT"] = "Git Analyzer"
+os.environ["LANGCHAIN_PROJECT"] = "GitWatt"
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 
@@ -170,7 +166,7 @@ def repo_analyzer(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
     repo_path, _ = get_latest_commit_sha(repo_url, branch)
-    return analyze_repo_mock(repo_path, directory).dict(by_alias=True)
+    return analyze_repo(repo_path, directory).dict(by_alias=True)
 
 
 def environment_analyzer(request: https_fn.Request) -> dict:
@@ -180,7 +176,7 @@ def environment_analyzer(request: https_fn.Request) -> dict:
     gcp_instance = Instance(**body.get("gcp"))
     azure_instance = Instance(**body.get("azure"))
 
-    return estimate_environment_mock(aws_instance, gcp_instance, azure_instance).dict(
+    return estimate_environment(aws_instance, gcp_instance, azure_instance).dict(
         by_alias=True
     )
 
