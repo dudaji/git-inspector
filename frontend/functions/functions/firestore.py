@@ -10,6 +10,22 @@ from functions.analyzer.model import GeminiAnalysis, Scores
 from functions.analyzer.full_analyzer import FinalResponse
 
 
+def get_from_firestore(collection: str, key: str) -> Optional[dict]:
+    db = None
+    if firebase_admin._apps:
+        db = firestore.client()
+    else:
+        raise SystemError("Firebase app is not initialized")
+
+    analysis_ref = db.collection(collection).document(key)
+    doc = analysis_ref.get()
+
+    if doc.exists:
+        return doc.to_dict()
+
+    return None
+
+
 def check_cache(gemini_analysis_key: str) -> Optional[dict]:
     db = None
     if firebase_admin._apps:

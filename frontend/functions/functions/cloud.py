@@ -17,7 +17,12 @@ from functions.analyzer.full_analyzer import (
 from functions.analyzer.instance_selector import select_best_instance
 from functions.analyzer.model import Scores, DetailedScore
 from functions.analyzer.parser import Instance, InstanceResult
-from functions.firestore import check_cache, save_gemini_analysis, save_to_firestore
+from functions.firestore import (
+    check_cache,
+    get_from_firestore,
+    save_gemini_analysis,
+    save_to_firestore,
+)
 from functions.git import get_latest_commit_sha
 from functions.analyzer.repo_analyzer import analyze_repo
 
@@ -162,6 +167,7 @@ def analyze(request: https_fn.Request) -> dict:
 
 
 def repo_analyzer(request: https_fn.Request) -> dict:
+    print("Repo Analyzer")
     body = request.get_json(silent=True)
     if not body:
         raise HttpsError(
@@ -172,16 +178,31 @@ def repo_analyzer(request: https_fn.Request) -> dict:
     repo_url = body.get("repoUrl")
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
-    repo_path, _ = get_latest_commit_sha(repo_url, branch)
-    return analyze_repo(repo_path, directory).dict(by_alias=True)
+    repo_path, sha = get_latest_commit_sha(repo_url, branch)
+    hash_key = get_gemini_analysis_key(repo_url, branch, directory, sha)
+
+    cache = get_from_firestore("repo_result", hash_key)
+    if cache:
+        return {**cache, "hash_id": hash_key}
+
+    result = analyze_repo(repo_path, directory).dict(by_alias=True)
+    save_to_firestore("repo_result", hash_key, result)
+
+    return {**result, "hash_id": hash_key}
 
 
 def environment_analyzer(request: https_fn.Request) -> dict:
+    print("Environment Analyzer")
     body = request.get_json(silent=True)
-    if not body:
+    print(body)
+    if not body or not body.get("hash_id"):
         raise HttpsError(
-            FunctionsErrorCode.INVALID_ARGUMENT, "Need body with aws, gcp, azure"
+            FunctionsErrorCode.INVALID_ARGUMENT, "Need body with aws, gcp, azure, id"
         )
+
+    hash_key = body.get("hash_id")
+    if cache := get_from_firestore("environment", hash_key):
+        return {**cache, "hash_id": hash_key}
 
     aws_instance = Instance(**body.get("aws"))
     gcp_instance = Instance(**body.get("gcp"))
@@ -190,7 +211,7 @@ def environment_analyzer(request: https_fn.Request) -> dict:
     result = estimate_environment(aws_instance, gcp_instance, azure_instance).dict(
         by_alias=True
     )
-    # save_to_firestore("environment", "", result)
+    save_to_firestore("environment", hash_key, result)
     return result
 
 
