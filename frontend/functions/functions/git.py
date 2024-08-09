@@ -18,8 +18,9 @@ def get_latest_commit_sha(repo_url: str, branch: str) -> Tuple[str, str]:
     else:
         repo = Repo(repo_path)
 
-    repo.git.checkout(branch)
     remote = repo.remotes.origin
+    remote.fetch()
+    repo.git.checkout(branch)
     remote.pull()
     sha = repo.head.object.hexsha
 

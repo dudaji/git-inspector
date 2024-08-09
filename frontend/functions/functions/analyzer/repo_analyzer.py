@@ -15,7 +15,9 @@ repo_dir = "repo"
 filter_doc_name = ["package-lock.json", "node-modules", "poetry.lock", ".DS_Store"]
 
 
-def load_repo_code(repo_path: str, directory: str = "") -> List[Document]:
+def load_repo_code(
+    repo_path: str, branch: str = "main", directory: str = ""
+) -> List[Document]:
     """
     Get all codes from given github repository
     Arguments:
@@ -27,6 +29,7 @@ def load_repo_code(repo_path: str, directory: str = "") -> List[Document]:
     """
     loader = GitLoader(
         repo_path=repo_path,
+        branch=branch,
     )
     docs = loader.load()
     if directory != "":
@@ -42,7 +45,7 @@ def load_repo_code(repo_path: str, directory: str = "") -> List[Document]:
     return docs
 
 
-def analyze_repo(repo_path: str, directory: str = "") -> RepoResult:
+def analyze_repo(repo_path: str, branch: str = "", directory: str = "") -> RepoResult:
     """
     Analyze given github repository and estimate maintenance price, power consumption, and
     carbon footprint
@@ -55,7 +58,7 @@ def analyze_repo(repo_path: str, directory: str = "") -> RepoResult:
     Returns:
         RepoResult: Analysis results for a given repository
     """
-    docs = load_repo_code(repo_path, directory)
+    docs = load_repo_code(repo_path, branch, directory)
     chain = repo_analyze_prompt | get_llm(temperature=0.5) | repo_result_parser
     repo_result = chain.invoke({"GITHUB": docs})
     repo_result: RepoResult = chain.invoke({"GITHUB": docs})

@@ -166,7 +166,7 @@ def repo_analyzer(request: https_fn.Request) -> dict:
     branch = body.get("branchName", "main")
     directory = body.get("directory", "")
     repo_path, _ = get_latest_commit_sha(repo_url, branch)
-    return analyze_repo(repo_path, directory).dict(by_alias=True)
+    return analyze_repo(repo_path, branch, directory).dict(by_alias=True)
 
 
 def environment_analyzer(request: https_fn.Request) -> dict:
