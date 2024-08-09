@@ -18,12 +18,12 @@ export const metadata: Metadata = {
     "Cloud Platform",
     "Eco-friendly",
     "Cost Optimization",
-    "Git Watt",
+    "GitWatt",
     "Sustainability",
     "Green Computing",
   ],
   openGraph: {
-    title: "Git Watt - Optimize Cloud Deployment",
+    title: "GitWatt - Optimize Cloud Deployment",
     description:
       "Analyze your Git repository to determine the most economical and eco-friendly cloud platform for deployment using Google Gemini",
     url: "https://git-inspector-nextjs14--gpu-brokerage.us-central1.hosted.app/",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
         url: "/assets/images/512.png",
         width: 512,
         height: 512,
-        alt: "Git Watt Icon",
+        alt: "GitWatt Icon",
       },
     ],
   },
@@ -54,14 +54,14 @@ export default function RootLayout({
           <header className="bg-muted p-4">
             <nav className="container mx-auto flex items-center justify-between">
               <Link href="/" className="text-lg font-bold" prefetch={false}>
-                GitWatt 
+                GitWatt
               </Link>
             </nav>
           </header>
           <main className="flex-1 py-12 relative"><PlasmaEffect/>{children}</main>
           <footer className="bg-muted p-4 text-center text-muted-foreground">
             <div className="container mx-auto">
-              &copy; 2024 Git Watt. All rights reserved.
+              &copy; 2024 GitWatt. All rights reserved.
             </div>
           </footer>
         </div>

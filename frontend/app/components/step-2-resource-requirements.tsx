@@ -37,7 +37,7 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
       <CardContent className="flex flex-col items-center justify-center h-full">
         <div className="flex items-center">
           <div className="text-4xl font-bold text-primary">
-            {minCpu}
+            {minCpu} &nbsp;
           </div>
           <div className="text-4xl font-medium text-muted-foreground">CPU</div>
         </div>

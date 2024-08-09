@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect } from "react";
+import { Button } from "./button";
 
 interface ModalProps {
   isVisible: boolean;
@@ -35,9 +36,9 @@ const Modal = ({ isVisible, onClose, children }: ModalProps) => {
         className="p-6 rounded-lg shadow-lg w-full max-w-3xl bg-primary-foreground overflow-y-auto max-h-full"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="float-right text-gray-700">
+        <Button onClick={onClose} className="float-right text-gray-700">
           &times;
-        </button>
+        </Button>
         {children}
       </div>
     </div>
