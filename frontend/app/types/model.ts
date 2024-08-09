@@ -70,7 +70,6 @@ export interface CloudProvider {
   estimate: Estimate;
 }
 
-
 // Github Body
 export interface GitBody {
   repoUrl: string;
@@ -83,6 +82,7 @@ export interface EnvBody {
   aws: CloudInstance;
   gcp: CloudInstance;
   azure: CloudInstance;
+  hash_id: string;
 }
 
 // Analyze Instance Body
@@ -91,3 +91,4 @@ export interface AnalyzeInstanceBody {
   gcp: InstanceResult;
   azure: InstanceResult;
 }
+

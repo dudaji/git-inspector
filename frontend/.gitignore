@@ -12,3 +12,4 @@ node_modules
 !firebase.json
 !components.json
 !firebase.indexes.json
+firebase-svc-account-key.json
