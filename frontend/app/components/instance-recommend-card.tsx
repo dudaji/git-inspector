@@ -22,8 +22,11 @@ const InstanceRecommendCard: React.FC<InstanceRecommendCardProps> = ({
     { name: "Instance Name", value: instance.name },
     { name: "CPU", value: instance.cpu },
     { name: "Memory", value: instance.ram },
-    { name: "Region", value: instance.region},
-    { name: "Cost per Hour", value: `${instance.costPerHour} $` },
+    { name: "Region", value: instance.region },
+    {
+      name: "Cost per Hour",
+      value: `${Number(instance.costPerHour).toPrecision(3)} $`,
+    },
   ];
 
   return (
@@ -38,9 +41,16 @@ const InstanceRecommendCard: React.FC<InstanceRecommendCardProps> = ({
       </h2>
       <div className="space-y-4">
         {instanceDetails.map((detail) => (
-          <div key={detail.name} className="flex justify-between items-center mb-1">
-            <span className="text-lg font-medium text-gray-700">{detail.name}</span>
-            <span className="text-lg font-medium text-gray-700">{detail.value}</span>
+          <div
+            key={detail.name}
+            className="flex justify-between items-center mb-1"
+          >
+            <span className="text-lg font-medium text-gray-700">
+              {detail.name}
+            </span>
+            <span className="text-lg font-medium text-gray-700">
+              {detail.value}
+            </span>
           </div>
         ))}
       </div>
