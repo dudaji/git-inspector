@@ -185,7 +185,7 @@ def repo_analyzer(request: https_fn.Request) -> dict:
     if cache:
         return {**cache, "hash_id": hash_key}
 
-    result = analyze_repo(repo_path, directory).dict(by_alias=True)
+    result = analyze_repo(repo_path, branch, directory).dict(by_alias=True)
     save_to_firestore("repo_result", hash_key, result)
 
     return {**result, "hash_id": hash_key}
