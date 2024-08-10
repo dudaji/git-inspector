@@ -125,7 +125,7 @@ export default async function ResultsPage({
   const hashKey = analysisData?.hash_id;
 
   return (
-    <div className="mx-auto max-w-6xl p-4 bg-background border">
+    <div className="mx-auto max-w-6xl p-4 bg-background border rounded-lg">
       <CardHeader>
         <CardTitle className="text-xl font-bold">
           Analysis Results of branch

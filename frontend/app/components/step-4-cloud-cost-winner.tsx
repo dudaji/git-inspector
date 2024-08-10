@@ -75,7 +75,7 @@ const CloudCostInstancesWithData = ({
             onClick={() => setShowDetails(true)}
             className="w-2/3"
           >
-            Show all
+            Show Descriptions
           </Button>
         </div>
       <Modal isVisible={showDetails} onClose={() => setShowDetails(false)}>

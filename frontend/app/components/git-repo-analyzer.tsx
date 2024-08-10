@@ -60,7 +60,7 @@ export function GitRepoAnalyzer() {
       setTimeout(() => {
         router.push(path);
         // setLoading(false);
-      }, 3000); // 최소 5초 동안 로딩 상태 유지(개발용)
+      }, 3000); // 최소 3초 동안 로딩 상태 유지(개발용)
     } catch (err) {
       setLoading(false);
       if (err instanceof Error) {

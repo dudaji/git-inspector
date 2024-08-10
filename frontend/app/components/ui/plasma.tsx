@@ -2,11 +2,25 @@
 const generateLightningPath = (width: number, height: number, segments: number) => {
   let path = `M0 ${height / 2}`;
   const minHeight = 10; // 높이의 최소값 설정
+  let prevX = 0;
+  let prevY = height / 2;
+
   for (let i = 1; i <= segments; i++) {
-    const x = (width / segments) * i;
+    // 각 segment의 x 위치를 더 불규칙하게 만듦
+    const x = prevX + Math.random() * (width / segments) * 1.5; // 더 불규칙하게
     const y = Math.max(Math.random() * height, minHeight);
-    path += ` L${x} ${y}`;
+    
+    // 중간 곡선을 위한 제어점 설정 (Quadratic Bezier curve)
+    const controlX = prevX + (Math.random() * (x - prevX)); // 불규칙한 제어점 위치
+    const controlY = Math.max(Math.random() * height, minHeight);
+
+    // `Q` 명령어로 곡선을 생성
+    path += ` Q${controlX} ${controlY}, ${x} ${y}`;
+
+    prevX = x;
+    prevY = y;
   }
+
   return path;
 };
 
