@@ -19,7 +19,9 @@ export function ResourceRequirements({ data }: ResourceRequirementsProps) {
       data.gcp,
       data.aws,
       data.azure,
-    ];
+    ].filter(instance => instance && typeof instance.cpu === 'number' && typeof instance.ram === 'number');
+
+    if (instances.length === 0) return { minCpu: 1, minMemory: 1 };
 
     const minCpu = Math.max(1, Math.min(...instances.map(instance => instance.cpu)));
     const minMemory = Math.max(1, Math.min(...instances.map(instance => instance.ram)));
